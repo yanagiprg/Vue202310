@@ -1,12 +1,23 @@
 <template>
   <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
+    <the-header :user="user" />
     <router-view />
   </div>
 </template>
+
+<script lang="ts">
+import TheHeader from "@/components/TheHeader.vue";
+import { mapState } from "vuex";
+
+export default {
+  components: {
+    TheHeader,
+  },
+  computed: {
+    ...mapState(["user"]),
+  },
+};
+</script>
 
 <style lang="scss">
 #app {
