@@ -5,6 +5,12 @@
       <router-link class="mr-4 hover:text-blue-200" to="/about"
         >About</router-link
       >
+      <router-link
+        v-if="user"
+        class="mr-4 hover:text-blue-200"
+        to="/post/create"
+        >New Post</router-link
+      >
       <p
         v-if="user"
         class="mr-4 hover:text-blue-200 cursor-pointer inline-block"

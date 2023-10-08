@@ -14,7 +14,7 @@ export default {
     TheHeader,
   },
   computed: {
-    ...mapState(["user"]),
+    ...mapState("auth", ["user"]),
   },
 };
 </script>

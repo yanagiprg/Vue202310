@@ -7,15 +7,12 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "home",
+    name: "posts",
     component: HomeView,
   },
   {
     path: "/about",
     name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
   },
@@ -30,6 +27,30 @@ const routes: Array<RouteConfig> = [
     name: "login",
     component: () =>
       import(/* webpackChunkName: "login" */ "../views/LoginView.vue"),
+  },
+  {
+    path: "/post",
+    beforeEnter(to, from, next) {
+      next("/");
+    },
+  },
+  {
+    path: "/post/create",
+    name: "post-create",
+    component: () =>
+      import(/* webpackChunkName: "create-post" */ "../views/CreateView.vue"),
+  },
+  {
+    path: "/post/:id",
+    name: "post",
+    component: () =>
+      import(/* webpackChunkName: "post" */ "../views/PostView.vue"),
+  },
+  {
+    path: "/post/:id/edit",
+    name: "post-edit",
+    component: () =>
+      import(/* webpackChunkName: "edit-post" */ "../views/EditView.vue"),
   },
 ];
 
