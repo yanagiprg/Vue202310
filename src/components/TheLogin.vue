@@ -59,7 +59,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    ...mapActions(["login", "loginWithGoogle"]),
+    ...mapActions("auth", ["login", "loginWithGoogle"]),
     async signin() {
       await (this as any).login({
         email: this.email,
