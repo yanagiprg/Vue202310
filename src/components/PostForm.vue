@@ -53,7 +53,7 @@ import { mapActions } from "vuex";
 
 export default {
   props: {
-    user: Object,
+    authUser: Object,
   },
   data() {
     return {
@@ -68,8 +68,8 @@ export default {
     };
   },
   created() {
-    this.post.userId = this.user.uid;
-    this.post.userName = this.user.email;
+    this.post.userId = this.authUser.uid;
+    this.post.userName = this.authUser.displayName;
   },
   methods: {
     ...mapActions("posts", ["createPost"]),
@@ -78,7 +78,7 @@ export default {
       this.post.content = "";
     },
     addPost() {
-      if (this.post.title && this.post.content && this.user) {
+      if (this.post.title && this.post.content && this.authUser) {
         this.createPost(this.post);
         this.resetPost();
         this.$router.push("/");

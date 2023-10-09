@@ -61,14 +61,14 @@ export default Vue.extend({
   methods: {
     ...mapActions("auth", ["login", "loginWithGoogle"]),
     async signin() {
-      await (this as any).login({
+      await this.login({
         email: this.email,
         password: this.password,
       });
       this.$router.push("/");
     },
     async signinWithGoogle() {
-      await (this as any).loginWithGoogle();
+      await this.loginWithGoogle();
       this.$router.push("/");
     },
   },

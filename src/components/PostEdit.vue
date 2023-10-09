@@ -51,10 +51,10 @@ export default {
   methods: {
     ...mapActions("posts", ["updatePost", "getPostById"]),
     async fetchPost() {
-      this.post = await (this as any).getPostById(this.post.id);
+      this.post = await this.getPostById(this.post.id);
     },
     async handleUpdatePost() {
-      await (this as any).updatePost(this.post);
+      await this.updatePost(this.post);
       this.$router.push(`/post/${this.post.id}`);
     },
   },

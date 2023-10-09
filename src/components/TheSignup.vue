@@ -2,6 +2,18 @@
   <div class="signup p-8 bg-gray-100 rounded-md w-full max-w-md mx-auto mt-8">
     <table class="w-full">
       <tr>
+        <th class="text-left pb-4">ユーザーネーム</th>
+      </tr>
+      <tr>
+        <td>
+          <input
+            class="w-full p-2 border rounded-md"
+            type="text"
+            v-model="displayName"
+          />
+        </td>
+      </tr>
+      <tr>
         <th class="text-left pb-4">メールアドレス</th>
       </tr>
       <tr>
@@ -42,14 +54,16 @@ import Vue from "vue";
 export default Vue.extend({
   data() {
     return {
+      displayName: "",
       email: "",
       password: "",
     };
   },
   methods: {
-    ...mapActions(["signup"]),
+    ...mapActions("auth", ["signup"]),
     async signupUser() {
-      await (this as any).signup({
+      await this.signup({
+        displayName: this.displayName,
         email: this.email,
         password: this.password,
       });

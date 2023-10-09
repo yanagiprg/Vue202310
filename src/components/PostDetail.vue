@@ -4,15 +4,18 @@
       <h2 class="text-2xl font-semibold mb-4">{{ post.title }}</h2>
       <p class="text-gray-700">{{ post.content }}</p>
       <p class="text-gray-500 text-sm mt-2">作成者: {{ post.userName }}</p>
+      <p class="text-gray-500 text-sm mt-2">
+        更新時間: {{ formatTimestamp(post.updatedAt) }}
+      </p>
       <router-link
-        v-if="user && user.uid === post.userId"
+        v-if="authUser && authUser.uid === post.userId"
         :to="`/post/${post.id}/edit`"
         class="mt-4 mr-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
       >
         編集
       </router-link>
       <button
-        v-if="user && user.uid === post.userId"
+        v-if="authUser && authUser.uid === post.userId"
         @click.prevent="deletePost"
         class="mt-4 ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
       >
@@ -24,14 +27,15 @@
 
 <script lang="ts">
 import { mapState, mapActions } from "vuex";
+import { formatTimestamp } from "@/utils/formatTimestamp";
 
 export default {
   props: {
-    user: Object,
+    authUser: Object,
   },
   async created() {
     const postId = this.$route.params.id;
-    await (this as any).getPostById(postId);
+    await this.getPostById(postId);
   },
   computed: {
     ...mapState("posts", ["post"]),
@@ -40,9 +44,10 @@ export default {
     ...mapActions("posts", ["getPostById", "removePost"]),
     async deletePost() {
       const postId = this.$route.params.id;
-      await (this as any).removePost(postId);
+      await this.removePost(postId);
       this.$router.push("/");
     },
+    formatTimestamp,
   },
 };
 </script>

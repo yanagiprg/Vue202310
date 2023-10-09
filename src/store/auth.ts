@@ -4,27 +4,60 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
 } from "firebase/auth";
+// import {
+//   addDoc,
+//   collection,
+//   deleteDoc,
+//   doc,
+//   getDoc,
+//   getDocs,
+//   setDoc,
+// } from "firebase/firestore";
+// import { User } from "@/types/types";
 
 const state = {
-  user: null,
+  authUser: null,
+  // users: [],
+  // user: {},
 };
 
 const getters = {};
 const mutations = {
-  SET_USER(state, user) {
-    state.user = user;
+  SET_AUTH_USER(state, authUser) {
+    state.authUser = authUser;
   },
+  // SET_USERS(state, users) {
+  //   state.users = users;
+  // },
+  // UPDATE_USER(state, editedUser) {
+  //   const index = state.users.findIndex((user) => user.id === editedUser.id);
+  //   if (index !== -1) {
+  //     state.users[index] = editedUser;
+  //   }
+  // },
+  // DELETE_USER(state, userId) {
+  //   state.users = state.users.filter((user: User) => user.id !== userId);
+  // },
+  // SET_USER(state, user) {
+  //   state.user = user;
+  // },
 };
 const actions = {
-  async signup({ commit }, { email, password }) {
+  async signup({ commit }, { displayName, email, password }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      commit("SET_USER", userCredential.user);
+      await updateProfile(userCredential.user, {
+        displayName: displayName,
+      });
+      commit("SET_AUTH_USER", userCredential.user);
+      // dispatch("createUser", userCredential.user);
+      // commit("SET_USER", userCredential.user);
       alert("User created!");
     } catch (error) {
       alert("Error creating user!");
@@ -38,7 +71,8 @@ const actions = {
         email,
         password
       );
-      commit("SET_USER", userCredential.user);
+      commit("SET_AUTH_USER", userCredential.user);
+      // commit("SET_USER", userCredential.user);
       alert("User logged in!");
     } catch (error) {
       alert("Error logging in!");
@@ -48,7 +82,8 @@ const actions = {
   async logout({ commit }) {
     try {
       await auth.signOut();
-      commit("SET_USER", null);
+      commit("SET_AUTH_USER", null);
+      // commit("SET_USER", {});
       alert("User logged out!");
     } catch (error) {
       alert("Error logging out!");
@@ -59,13 +94,111 @@ const actions = {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      commit("SET_USER", userCredential.user);
+      commit("SET_AUTH_USER", userCredential.user);
+      // commit("SET_USER", {});
       alert("Logged in with Google!");
     } catch (error) {
       alert("Error logging in with Google!");
       console.error("Error logging in with Google:", error);
     }
   },
+  async updateAuthUser({ commit }, editedUser) {
+    const authUser = auth.currentUser;
+    try {
+      await updateProfile(authUser, {
+        displayName: editedUser.displayName,
+      });
+      commit("SET_AUTH_USER", authUser);
+      alert("ユーザー情報を更新しました。");
+
+      // dispatch("updateUser", editedUser);
+    } catch (error) {
+      alert("Error updating user!");
+      console.error("Error updating user:", error);
+    }
+  },
+  async deleteAuthUser({ commit }) {
+    const authUser = auth.currentUser;
+    console.log(authUser);
+    try {
+      await authUser.delete();
+      commit("SET_AUTH_USER", null);
+      // dispatch("deleteUser", userId);
+      alert("User deleted!");
+    } catch (error) {
+      alert("Error deleting user!");
+      console.error("Error deleting user:", error);
+    }
+  },
+  // async getUsers({ commit }) {
+  //   try {
+  //     const querySnapshot = await getDocs(collection(db, "users"));
+  //     const users: User[] = [];
+  //     querySnapshot.forEach((doc) => {
+  //       const user = {
+  //         id: doc.id,
+  //         ...doc.data(),
+  //       } as User;
+  //       users.push(user);
+  //     });
+  //     commit("SET_USERS", users);
+  //   } catch (error) {
+  //     console.error("Error fetching users: ", error);
+  //   }
+  // },
+  // async createUser({ dispatch }, user: User) {
+  //   try {
+  //     const userData = {
+  //       email: user.email,
+  //       displayName: user.displayName,
+  //       createdAt: new Date(),
+  //       updatedAt: new Date(),
+  //     };
+  //     await addDoc(collection(db, "users"), userData);
+  //     dispatch("getUsers");
+  //   } catch (error) {
+  //     alert("ユーザーの作成に失敗しました。");
+  //     console.error("Error adding user: ", error);
+  //   }
+  // },
+  // async updateUser({ commit }, editedUser: User) {
+  //   try {
+  //     await setDoc(doc(db, "users", editedUser.id), editedUser);
+  //     commit("UPDATE_USER", editedUser);
+  //     alert("ユーザー情報を更新しました。");
+  //   } catch (error) {
+  //     alert("ユーザー情報の更新に失敗しました。");
+  //     console.error("Error editing user: ", error);
+  //   }
+  // },
+  // async deleteUser({ commit }, userId: string) {
+  //   try {
+  //     await deleteDoc(doc(db, "users", userId));
+  //     commit("DELETE_USER", userId);
+  //     alert("ユーザーを削除しました。");
+  //   } catch (error) {
+  //     alert("ユーザーの削除に失敗しました。");
+  //     console.error("Error deleting user: ", error);
+  //   }
+  // },
+  // async getUser({ commit }, userId: string) {
+  //   try {
+  //     const docRef = doc(db, "users", userId);
+  //     const docSnap = await getDoc(docRef);
+  //     if (docSnap.exists()) {
+  //       const user = {
+  //         id: docSnap.id,
+  //         ...docSnap.data(),
+  //       } as User;
+  //       commit("SET_USER", user);
+  //     } else {
+  //       alert("ユーザーが見つかりません。");
+  //     }
+  //   } catch (error) {
+  //     alert("ユーザーの取得に失敗しました。");
+  //     console.error("Error getting user: ", error);
+  //   }
+  // },
 };
 
 export default {

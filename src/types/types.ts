@@ -9,8 +9,11 @@ export type Article = {
   categories?: string[];
   tags?: string[];
 };
-export type AuthUser = {
-  id?: string;
-  email?: string;
-  displayName?: string;
-};
+// export type User = {
+//   id: string;
+//   email: string;
+//   displayName: string;
+//   // role: "admin" | "member";
+//   createdAt: Date;
+//   updatedAt: Date;
+// };

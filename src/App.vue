@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <the-header :user="user" />
+    <the-header :authUser="authUser" />
     <router-view />
   </div>
 </template>
@@ -14,7 +14,7 @@ export default {
     TheHeader,
   },
   computed: {
-    ...mapState("auth", ["user"]),
+    ...mapState("auth", ["authUser"]),
   },
 };
 </script>

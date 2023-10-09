@@ -52,6 +52,18 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "edit-post" */ "../views/EditView.vue"),
   },
+  {
+    path: "/user",
+    beforeEnter(to, from, next) {
+      next("/");
+    },
+  },
+  {
+    path: "/user/:id",
+    name: "user-profile",
+    component: () =>
+      import(/* webpackChunkName: "user" */ "../views/UserView.vue"),
+  },
 ];
 
 const router = new VueRouter({

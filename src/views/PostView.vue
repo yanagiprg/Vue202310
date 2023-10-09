@@ -1,6 +1,6 @@
 <template>
   <div>
-    <post-detail :user="user" />
+    <post-detail :authUser="authUser" />
   </div>
 </template>
 
@@ -13,7 +13,7 @@ export default {
     PostDetail,
   },
   computed: {
-    ...mapState("auth", ["user"]),
+    ...mapState("auth", ["authUser"]),
   },
 };
 </script>
