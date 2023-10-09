@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "dayjs": "^1.11.10",
+    "dayjs-ext": "^2.2.0",
     "dotenv": "^16.3.1",
     "dotenv-webpack": "^8.0.1",
     "firebase": "^10.4.0",

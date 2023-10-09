@@ -6,25 +6,31 @@
         >About</router-link
       >
       <router-link
-        v-if="user"
+        v-if="authUser"
         class="mr-4 hover:text-blue-200"
         to="/post/create"
         >New Post</router-link
       >
-      <p
-        v-if="user"
+      <router-link
+        v-if="authUser"
         class="mr-4 hover:text-blue-200 cursor-pointer inline-block"
+        :to="`/user/${authUser.uid}`"
       >
-        {{ user.email }}
-      </p>
+        {{ authUser.displayName }}
+      </router-link>
       <p
-        v-if="user"
+        v-if="authUser"
         @click.prevent="logoutUser"
         class="hover:text-blue-200 cursor-pointer inline-block"
       >
         Logout
       </p>
-      <router-link v-if="!user" to="/login">Login</router-link>
+      <router-link
+        v-if="!authUser"
+        class="hover:text-blue-200 cursor-pointer inline-block"
+        to="/login"
+        >Login</router-link
+      >
     </nav>
   </header>
 </template>
@@ -35,15 +41,15 @@ import Vue from "vue";
 
 export default Vue.extend({
   props: {
-    user: Object,
+    authUser: Object,
   },
   data() {
     return {};
   },
   methods: {
-    ...mapActions(["logout"]),
+    ...mapActions("auth", ["logout"]),
     async logoutUser() {
-      await (this as any).logout();
+      await this.logout();
       this.$router.push("/login");
     },
   },
