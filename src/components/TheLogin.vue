@@ -1,41 +1,42 @@
 <template>
-  <div class="signin p-8 bg-gray-100 rounded-md w-full max-w-md mx-auto mt-8">
-    <table class="w-full">
-      <tr>
-        <th class="text-left pb-4">メールアドレス</th>
-      </tr>
-      <tr>
-        <td>
-          <input
-            class="w-full p-2 border rounded-md"
-            type="email"
-            v-model="email"
-          />
-        </td>
-      </tr>
-      <tr>
-        <th class="text-left py-4">パスワード</th>
-      </tr>
-      <tr>
-        <td>
-          <input
-            class="w-full p-2 border rounded-md"
-            type="password"
-            v-model="password"
-          />
-        </td>
-      </tr>
-    </table>
+  <div
+    class="signin p-8 bg-white shadow-lg rounded-lg w-full max-w-md mx-auto mt-8"
+  >
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="email"
+        >メールアドレス</label
+      >
+      <input
+        class="w-full p-2 border rounded-md"
+        type="email"
+        v-model="email"
+        id="email"
+      />
+    </div>
+
+    <div class="mb-6">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="password"
+        >パスワード</label
+      >
+      <input
+        class="w-full p-2 border rounded-md"
+        type="password"
+        v-model="password"
+        id="password"
+      />
+    </div>
+
     <button
-      class="mt-6 w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+      class="mt-4 w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
       @click.prevent="signin"
     >
       ログイン
     </button>
     <button
-      class="mt-6 w-full bg-white text-blue-500 p-2 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+      class="mt-4 w-full bg-white text-blue-500 p-2 rounded hover:bg-gray-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
       @click.prevent="signinWithGoogle"
     >
+      <span class="material-icons mr-2">account_circle</span>
       Login with Google
     </button>
     <p class="mt-4 text-center">

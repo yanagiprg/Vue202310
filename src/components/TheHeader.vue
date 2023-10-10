@@ -1,33 +1,36 @@
 <template>
   <header class="bg-blue-500 p-4 shadow-md">
-    <nav class="container mx-auto text-white font-bold inline-block">
-      <router-link class="mr-4 hover:text-blue-200" to="/">Home</router-link>
-      <router-link class="mr-4 hover:text-blue-200" to="/about"
+    <nav
+      class="container mx-auto text-white font-semibold flex justify-center items-center"
+    >
+      <router-link class="px-3 py-2 rounded hover:bg-blue-700" to="/"
+        >Home</router-link
+      >
+      <router-link class="px-3 py-2 rounded hover:bg-blue-700" to="/about"
         >About</router-link
       >
       <router-link
         v-if="authUser"
-        class="mr-4 hover:text-blue-200"
+        class="px-3 py-2 rounded hover:bg-blue-700"
         to="/post/create"
         >New Post</router-link
       >
       <router-link
         v-if="authUser"
-        class="mr-4 hover:text-blue-200 cursor-pointer inline-block"
+        class="px-3 py-2 rounded hover:bg-blue-700"
         :to="`/user/${authUser.uid}`"
+        >{{ authUser.displayName }}</router-link
       >
-        {{ authUser.displayName }}
-      </router-link>
       <p
         v-if="authUser"
         @click.prevent="logoutUser"
-        class="hover:text-blue-200 cursor-pointer inline-block"
+        class="px-3 py-2 rounded hover:bg-blue-700 cursor-pointer inline-block"
       >
         Logout
       </p>
       <router-link
         v-if="!authUser"
-        class="hover:text-blue-200 cursor-pointer inline-block"
+        class="px-3 py-2 rounded hover:bg-blue-700"
         to="/login"
         >Login</router-link
       >

@@ -23,7 +23,7 @@
       </button>
     </div>
     <!-- Comments Section -->
-    <div v-if="comments?.length" class="mt-10 max-w-2xl mx-auto">
+    <div v-if="pagedComments?.length" class="mt-10 max-w-2xl mx-auto">
       <h3 class="text-xl font-semibold mb-4 border-b-2 border-gray-300 pb-2">
         コメント
       </h3>
@@ -57,6 +57,25 @@
       </div>
     </div>
 
+    <!-- Pagination Controls for Comments -->
+    <div class="flex justify-center mt-6 items-center">
+      <button
+        :disabled="commentPage === 1"
+        @click="prevCommentPage"
+        class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+      >
+        前へ
+      </button>
+      <span class="mx-2">{{ commentPage }}/{{ totalCommentPages }}</span>
+      <button
+        :disabled="commentPage === totalCommentPages"
+        @click="nextCommentPage"
+        class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+      >
+        次へ
+      </button>
+    </div>
+
     <!-- Add Comment Form -->
     <div
       v-if="authUser"
@@ -88,6 +107,8 @@ export default {
   data() {
     return {
       newComment: "",
+      commentPage: 1,
+      commentsPerPage: 10,
     };
   },
   async created() {
@@ -97,6 +118,14 @@ export default {
   },
   computed: {
     ...mapState("posts", ["post", "comments"]),
+    pagedComments() {
+      const start = (this.commentPage - 1) * this.commentsPerPage;
+      const end = start + this.commentsPerPage;
+      return this.comments.slice(start, end);
+    },
+    totalCommentPages() {
+      return Math.ceil(this.comments.length / this.commentsPerPage);
+    },
   },
   methods: {
     ...mapActions("posts", [
@@ -129,6 +158,16 @@ export default {
     },
     formatTimestamp,
     formatJapaneseDate,
+    nextCommentPage() {
+      if (this.commentPage < this.totalCommentPages) {
+        this.commentPage += 1;
+      }
+    },
+    prevCommentPage() {
+      if (this.commentPage > 1) {
+        this.commentPage -= 1;
+      }
+    },
   },
 };
 </script>

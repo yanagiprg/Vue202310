@@ -4,19 +4,21 @@
       <h2 class="text-2xl font-semibold mb-4">ブログ一覧</h2>
 
       <!-- Filter & Sorting Controls -->
-      <div class="flex justify-between items-center mb-4">
-        <div>
+      <div
+        class="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow"
+      >
+        <div class="flex items-center space-x-4">
           <button
             v-if="authUser"
             @click="filterByUser"
-            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+            class="text-blue-500 border border-blue-500 px-4 py-2 rounded hover:bg-blue-500 hover:text-white focus:outline-none transition-colors duration-200"
           >
             {{ showUserPosts ? "全ての投稿" : "自分の投稿" }}
           </button>
         </div>
-        <div>
-          <label>並べ替え:</label>
-          <select v-model="sortOrder" class="ml-2">
+        <div class="flex items-center space-x-2">
+          <span class="text-gray-600">並べ替え:</span>
+          <select v-model="sortOrder" class="ml-2 p-2 border rounded">
             <option value="updatedAt">更新順</option>
             <option value="commentsCount">コメント数順</option>
             <option value="title">タイトル順</option>
@@ -27,21 +29,61 @@
 
       <!-- Posts List -->
       <div
-        v-for="post in sortedPosts"
+        v-for="post in paginatedPosts"
         :key="post.id"
-        class="bg-white rounded-lg shadow-md p-4 mb-4"
+        class="bg-white rounded-lg shadow-lg p-5 mb-5 hover:shadow-xl transition-shadow duration-300"
       >
         <router-link :to="`/post/${post.id}`">
-          <h2 class="text-xl font-semibold mb-2">{{ post.title }}</h2>
-          <p class="text-gray-700">{{ post.content }}</p>
-          <p class="text-gray-500 text-sm mt-2">作成者: {{ post.userName }}</p>
-          <p class="text-gray-500 text-sm mt-2">
-            更新時間: {{ formatTimestamp(post.updatedAt) }}
+          <h2 class="text-3xl font-bold mb-3 text-gray-800">
+            {{ post.title }}
+          </h2>
+          <p class="text-gray-600 overflow-ellipsis overflow-hidden h-14">
+            {{ post.content }}
           </p>
-          <p class="text-gray-500 text-sm mt-2">
-            コメント数: {{ commentsCount[post.id] || 0 }}
-          </p>
+
+          <div
+            class="flex justify-between items-center mt-5 pt-5 border-t border-gray-200"
+          >
+            <div class="flex items-center">
+              <span class="material-icons text-gray-500 mr-1"
+                >mode_comment</span
+              >
+              <span class="text-gray-500 text-sm"
+                >{{ commentsCount[post.id] || 0 }} コメント</span
+              >
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm flex items-center">
+                <span class="material-icons text-gray-500 mr-1"
+                  >account_circle</span
+                >{{ post.userName }}
+              </p>
+              <p class="text-gray-400 text-xs mt-1 flex items-center">
+                <span class="material-icons text-gray-400 mr-1">update</span
+                >{{ formatTimestamp(post.updatedAt) }}
+              </p>
+            </div>
+          </div>
         </router-link>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="flex justify-center mt-6 items-center">
+        <button
+          :disabled="currentPage === 1"
+          @click="previous"
+          class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+        >
+          前へ
+        </button>
+        <span class="mx-2">{{ currentPage }}/{{ totalPages }}</span>
+        <button
+          :disabled="currentPage === totalPages"
+          @click="next"
+          class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+        >
+          次へ
+        </button>
       </div>
     </div>
   </div>
@@ -63,6 +105,8 @@ export default {
     return {
       sortOrder: SORT_ORDERS.TITLE,
       showUserPosts: false,
+      currentPage: 1,
+      postsPerPage: 10,
     };
   },
   async created() {
@@ -98,6 +142,14 @@ export default {
       }
       return sorted;
     },
+    totalPages() {
+      return Math.ceil(this.posts.length / this.postsPerPage);
+    },
+    paginatedPosts() {
+      const start = (this.currentPage - 1) * this.postsPerPage;
+      const end = this.currentPage * this.postsPerPage;
+      return this.sortedPosts.slice(start, end);
+    },
   },
   methods: {
     ...mapActions("posts", ["getPosts", "countComments"]),
@@ -105,6 +157,16 @@ export default {
       this.showUserPosts = !this.showUserPosts;
     },
     formatTimestamp,
+    next() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    previous() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
   },
 };
 </script>
