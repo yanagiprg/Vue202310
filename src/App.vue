@@ -40,4 +40,25 @@ nav {
     }
   }
 }
+
+button {
+  transition: all 0.3s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+router-link {
+  transition: all 0.3s;
+}
+
+router-link:hover {
+  transform: translateY(-2px);
+}
 </style>
