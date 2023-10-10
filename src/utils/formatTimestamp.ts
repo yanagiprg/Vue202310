@@ -20,7 +20,22 @@ export const formatTimestamp = (timestamp: Timestamp): string => {
   const dateObj = dayjs(dateInMs).tz("Asia/Tokyo");
 
   // Format date
-  const formattedDate = dateObj.format("YYYY年MM月DD日HH時mm分ss秒");
+  const formattedDate = dateObj.format("YYYY年MM月DD日HH時mm分");
 
   return formattedDate;
+};
+
+// コメントのcreateAtをフォーマットする関数
+// "2023-10-10T00:31:14.280Z"
+export const formatJapaneseDate = (inputTimestamp) => {
+  // Dateオブジェクトを生成
+  const date = new Date(inputTimestamp);
+  // UTC+9時間を加えて日本時間に変換
+  date.setHours(date.getHours() + 9);
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const h = date.getHours();
+  const min = date.getMinutes();
+  return `${y}年${m}月${d}日${h}時${min}分`;
 };

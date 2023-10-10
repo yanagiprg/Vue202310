@@ -1,4 +1,4 @@
-import { Article } from "@/types/types";
+import { Article, Comment } from "@/types/types";
 import db from "@/utils/firebase";
 import {
   collection,
@@ -13,6 +13,8 @@ import {
 const state = {
   posts: [],
   post: {},
+  comments: [],
+  commentsCount: {},
 };
 
 const mutations = {
@@ -30,6 +32,12 @@ const mutations = {
   },
   SET_POST(state, post) {
     state.post = post;
+  },
+  SET_COMMENTS(state, comments) {
+    state.comments = comments;
+  },
+  SET_COMMENTS_COUNT(state, counts) {
+    state.commentsCount = counts;
   },
 };
 
@@ -98,6 +106,59 @@ const actions = {
     } catch (error) {
       console.error("Error fetching post: ", error);
     }
+  },
+  // コメント機能
+  async getComments({ commit }, postId) {
+    try {
+      const postRef = doc(db, "posts", postId);
+      const commentsCollectionRef = collection(postRef, "comments");
+      const querySnapshot = await getDocs(commentsCollectionRef);
+      const comments = [];
+      querySnapshot.forEach((doc) => {
+        const comment = {
+          id: doc.id,
+          ...doc.data(),
+        };
+        comments.push(comment);
+      });
+      commit("SET_COMMENTS", comments);
+    } catch (error) {
+      console.error("Error fetching comments: ", error);
+    }
+  },
+  async addComment({ dispatch }, { postId, comment }) {
+    try {
+      const postRef = doc(db, "posts", postId);
+      const commentsCollectionRef = collection(postRef, "comments");
+      await addDoc(commentsCollectionRef, comment);
+      dispatch("getComments", postId);
+    } catch (error) {
+      alert("コメントの投稿に失敗しました。");
+      console.error("Error adding comment: ", error);
+    }
+  },
+  async deleteComment({ dispatch }, { postId, commentId }) {
+    try {
+      const postRef = doc(db, "posts", postId);
+      const commentRef = doc(postRef, "comments", commentId);
+      await deleteDoc(commentRef);
+      dispatch("getComments", postId);
+      alert("コメントを削除しました。");
+    } catch (error) {
+      alert("コメントの削除に失敗しました。");
+      console.error("Error deleting comment: ", error);
+    }
+  },
+  async countComments({ commit }) {
+    const counts = {};
+    const postsSnapshot = await getDocs(collection(db, "posts"));
+    for (const postDoc of postsSnapshot.docs) {
+      const postRef = doc(db, "posts", postDoc.id);
+      const commentsCollectionRef = collection(postRef, "comments");
+      const commentsSnapshot = await getDocs(commentsCollectionRef);
+      counts[postDoc.id] = commentsSnapshot.size;
+    }
+    commit("SET_COMMENTS_COUNT", counts);
   },
 };
 

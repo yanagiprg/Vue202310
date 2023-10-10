@@ -17,9 +17,10 @@
         <div>
           <label>並べ替え:</label>
           <select v-model="sortOrder" class="ml-2">
-            <option value="title">タイトル</option>
-            <option value="updatedAt">更新時間</option>
-            <option value="userName">作成者</option>
+            <option value="updatedAt">更新順</option>
+            <option value="commentsCount">コメント数順</option>
+            <option value="title">タイトル順</option>
+            <option value="userName">作成者名順</option>
           </select>
         </div>
       </div>
@@ -37,6 +38,9 @@
           <p class="text-gray-500 text-sm mt-2">
             更新時間: {{ formatTimestamp(post.updatedAt) }}
           </p>
+          <p class="text-gray-500 text-sm mt-2">
+            コメント数: {{ commentsCount[post.id] || 0 }}
+          </p>
         </router-link>
       </div>
     </div>
@@ -48,8 +52,9 @@ import { mapState, mapActions } from "vuex";
 import { formatTimestamp } from "@/utils/formatTimestamp";
 
 const SORT_ORDERS = {
-  TITLE: "title",
   UPDATED_AT: "updatedAt",
+  COMMENTS_COUNT: "commentsCount",
+  TITLE: "title",
   USER_NAME: "userName",
 };
 
@@ -60,20 +65,27 @@ export default {
       showUserPosts: false,
     };
   },
-  created() {
-    this.getPosts();
+  async created() {
+    await this.getPosts();
+    await this.countComments();
   },
   computed: {
-    ...mapState("posts", ["posts"]),
+    ...mapState("posts", ["posts", "commentsCount"]),
     ...mapState("auth", ["authUser"]),
     sortedPosts() {
       let sorted = [...this.posts];
       switch (this.sortOrder) {
-        case SORT_ORDERS.TITLE:
-          sorted.sort((a, b) => a.title.localeCompare(b.title));
-          break;
         case SORT_ORDERS.UPDATED_AT:
           sorted.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+          break;
+        case SORT_ORDERS.COMMENTS_COUNT:
+          sorted.sort(
+            (a, b) =>
+              (this.commentsCount[b.id] || 0) - (this.commentsCount[a.id] || 0)
+          );
+          break;
+        case SORT_ORDERS.TITLE:
+          sorted.sort((a, b) => a.title.localeCompare(b.title));
           break;
         case SORT_ORDERS.USER_NAME:
           sorted.sort((a, b) => a.userName.localeCompare(b.userName));
@@ -88,7 +100,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions("posts", ["getPosts"]),
+    ...mapActions("posts", ["getPosts", "countComments"]),
     filterByUser() {
       this.showUserPosts = !this.showUserPosts;
     },

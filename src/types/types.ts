@@ -9,6 +9,13 @@ export type Article = {
   categories?: string[];
   tags?: string[];
 };
+export type Comment = {
+  id: string;
+  content: string;
+  userId: string;
+  userName: string;
+  createdAt: Date;
+};
 // export type User = {
 //   id: string;
 //   email: string;
