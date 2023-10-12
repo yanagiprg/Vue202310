@@ -1,20 +1,43 @@
 <template>
   <div id="app">
     <the-header :authUser="authUser" />
-    <router-view />
+    <router-view class="mt-header" />
+    <dialog-component
+      v-if="showDialog"
+      :success="dialogIsSuccess"
+      :message="dialogMessage"
+      @dialogClosed="navigateToLocation"
+    />
   </div>
 </template>
 
 <script lang="ts">
+import { mapActions, mapGetters, mapState } from "vuex";
 import TheHeader from "@/components/TheHeader.vue";
-import { mapState } from "vuex";
+import DialogComponent from "@/components/shared/DialogComponent.vue";
 
 export default {
   components: {
     TheHeader,
+    DialogComponent,
   },
   computed: {
     ...mapState("auth", ["authUser"]),
+    ...mapGetters("utils", [
+      "showDialog",
+      "dialogMessage",
+      "dialogIsSuccess",
+      "targetLocation",
+    ]),
+  },
+  methods: {
+    ...mapActions("utils", ["closeDialog"]),
+    navigateToLocation() {
+      if (this.targetLocation) {
+        this.$router.push(this.targetLocation);
+      }
+      this.closeDialog();
+    },
   },
 };
 </script>
@@ -60,5 +83,9 @@ router-link {
 
 router-link:hover {
   transform: translateY(-2px);
+}
+
+.mt-header {
+  margin-top: 132px;
 }
 </style>

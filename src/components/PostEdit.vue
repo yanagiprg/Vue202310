@@ -50,12 +50,24 @@ export default {
   },
   methods: {
     ...mapActions("posts", ["updatePost", "getPostById"]),
+    ...mapActions("utils", ["openDialog"]),
     async fetchPost() {
       this.post = await this.getPostById(this.post.id);
     },
     async handleUpdatePost() {
-      await this.updatePost(this.post);
-      this.$router.push(`/post/${this.post.id}`);
+      const isUpdate = await this.updatePost(this.post);
+      if (isUpdate) {
+        this.openDialog({
+          message: "投稿を更新しました",
+          success: true,
+          targetLocation: `/post/${this.post.id}`,
+        });
+      } else {
+        this.openDialog({
+          message: "投稿の更新に失敗しました。",
+          success: false,
+        });
+      }
     },
   },
 };

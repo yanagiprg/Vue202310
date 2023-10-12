@@ -62,10 +62,10 @@ const actions = {
     try {
       await addDoc(collection(db, "posts"), post);
       dispatch("getPosts");
-      alert("記事を投稿しました。");
+      return true;
     } catch (error) {
-      alert("記事の投稿に失敗しました。");
       console.error("Error adding post: ", error);
+      return false;
     }
   },
   async updatePost({ commit }, post: Article) {
@@ -74,20 +74,20 @@ const actions = {
     try {
       await setDoc(postRef, post);
       commit("EDIT_POST", post);
-      alert("記事を更新しました。");
+      return true;
     } catch (error) {
-      alert("記事の更新に失敗しました。");
       console.error("Error updating post: ", error);
+      return false;
     }
   },
   async removePost({ commit }, postId: string) {
     try {
       await deleteDoc(doc(db, "posts", postId));
       commit("DELETE_POST", postId);
-      alert("記事を削除しました。");
+      return true;
     } catch (error) {
-      alert("記事の削除に失敗しました。");
       console.error("Error deleting post: ", error);
+      return false;
     }
   },
   async getPostById({ commit }, postId) {
@@ -133,7 +133,6 @@ const actions = {
       await addDoc(commentsCollectionRef, comment);
       dispatch("getComments", postId);
     } catch (error) {
-      alert("コメントの投稿に失敗しました。");
       console.error("Error adding comment: ", error);
     }
   },
@@ -143,9 +142,7 @@ const actions = {
       const commentRef = doc(postRef, "comments", commentId);
       await deleteDoc(commentRef);
       dispatch("getComments", postId);
-      alert("コメントを削除しました。");
     } catch (error) {
-      alert("コメントの削除に失敗しました。");
       console.error("Error deleting comment: ", error);
     }
   },

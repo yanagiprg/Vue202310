@@ -58,10 +58,10 @@ const actions = {
       commit("SET_AUTH_USER", userCredential.user);
       // dispatch("createUser", userCredential.user);
       // commit("SET_USER", userCredential.user);
-      alert("User created!");
+      return true;
     } catch (error) {
-      alert("Error creating user!");
       console.error("Error signup user:", error);
+      return false;
     }
   },
   async login({ commit }, { email, password }) {
@@ -72,22 +72,22 @@ const actions = {
         password
       );
       commit("SET_AUTH_USER", userCredential.user);
+      return true;
       // commit("SET_USER", userCredential.user);
-      alert("User logged in!");
     } catch (error) {
-      alert("Error logging in!");
       console.error("Error logging in:", error);
+      return false;
     }
   },
   async logout({ commit }) {
     try {
       await auth.signOut();
       commit("SET_AUTH_USER", null);
+      return true;
       // commit("SET_USER", {});
-      alert("User logged out!");
     } catch (error) {
-      alert("Error logging out!");
       console.error("Error logging out:", error);
+      return false;
     }
   },
   async loginWithGoogle({ commit }) {
@@ -96,10 +96,10 @@ const actions = {
       const userCredential = await signInWithPopup(auth, provider);
       commit("SET_AUTH_USER", userCredential.user);
       // commit("SET_USER", {});
-      alert("Logged in with Google!");
+      return true;
     } catch (error) {
-      alert("Error logging in with Google!");
       console.error("Error logging in with Google:", error);
+      return false;
     }
   },
   async updateAuthUser({ commit }, editedUser) {
@@ -109,25 +109,23 @@ const actions = {
         displayName: editedUser.displayName,
       });
       commit("SET_AUTH_USER", authUser);
-      alert("ユーザー情報を更新しました。");
-
       // dispatch("updateUser", editedUser);
+      return true;
     } catch (error) {
-      alert("Error updating user!");
       console.error("Error updating user:", error);
+      return false;
     }
   },
   async deleteAuthUser({ commit }) {
     const authUser = auth.currentUser;
-    console.log(authUser);
     try {
       await authUser.delete();
       commit("SET_AUTH_USER", null);
       // dispatch("deleteUser", userId);
-      alert("User deleted!");
+      return true;
     } catch (error) {
-      alert("Error deleting user!");
       console.error("Error deleting user:", error);
+      return false;
     }
   },
   // async getUsers({ commit }) {

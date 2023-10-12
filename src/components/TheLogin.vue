@@ -50,9 +50,8 @@
 
 <script lang="ts">
 import { mapActions } from "vuex";
-import Vue from "vue";
 
-export default Vue.extend({
+export default {
   data() {
     return {
       email: "",
@@ -61,17 +60,40 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions("auth", ["login", "loginWithGoogle"]),
+    ...mapActions("utils", ["openDialog"]),
     async signin() {
-      await this.login({
+      const isLogin = await this.login({
         email: this.email,
         password: this.password,
       });
-      this.$router.push("/");
+      if (isLogin) {
+        this.openDialog({
+          message: "ログインに成功しました！",
+          success: true,
+          targetLocation: "/",
+        });
+      } else {
+        this.openDialog({
+          message: "ログインに失敗しました。",
+          success: false,
+        });
+      }
     },
     async signinWithGoogle() {
-      await this.loginWithGoogle();
-      this.$router.push("/");
+      const isLogin = await this.loginWithGoogle();
+      if (isLogin) {
+        this.openDialog({
+          message: "Googleアカウントでのログインに成功しました！",
+          success: true,
+          targetLocation: "/",
+        });
+      } else {
+        this.openDialog({
+          message: "Googleアカウントでのログインに失敗しました。",
+          success: false,
+        });
+      }
     },
   },
-});
+};
 </script>
