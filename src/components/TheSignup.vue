@@ -49,9 +49,8 @@
 
 <script lang="ts">
 import { mapActions } from "vuex";
-import Vue from "vue";
 
-export default Vue.extend({
+export default {
   data() {
     return {
       displayName: "",
@@ -61,14 +60,26 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions("auth", ["signup"]),
+    ...mapActions("utils", ["openDialog"]),
     async signupUser() {
-      await this.signup({
+      const isSignup = await this.signup({
         displayName: this.displayName,
         email: this.email,
         password: this.password,
       });
-      this.$router.push("/");
+      if (isSignup) {
+        this.openDialog({
+          message: "ユーザー登録に成功しました",
+          success: true,
+          targetLocation: "/",
+        });
+      } else {
+        this.openDialog({
+          message: "ユーザー登録に失敗しました。",
+          success: false,
+        });
+      }
     },
   },
-});
+};
 </script>

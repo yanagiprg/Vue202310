@@ -59,9 +59,8 @@
 
 <script lang="ts">
 import { mapState, mapActions } from "vuex";
-import Vue from "vue";
 
-export default Vue.extend({
+export default {
   data() {
     return {
       editMode: false,
@@ -81,15 +80,39 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions("auth", ["updateAuthUser", "deleteAuthUser"]),
+    ...mapActions("utils", ["openDialog"]),
     updateProfile() {
       this.user.displayName = this.newDisplayName;
-      this.updateAuthUser(this.user);
+      const isUpdate = this.updateAuthUser(this.user);
+      if (isUpdate) {
+        this.openDialog({
+          message: "ユーザー情報を更新しました",
+          success: true,
+          targetLocation: "",
+        });
+      } else {
+        this.openDialog({
+          message: "ユーザー情報の更新に失敗しました。",
+          success: false,
+        });
+      }
       this.editMode = false;
     },
     removeUser() {
-      this.deleteAuthUser();
-      this.$router.push("/login");
+      const isDelete = this.deleteAuthUser();
+      if (isDelete) {
+        this.openDialog({
+          message: "ユーザーを削除しました",
+          success: true,
+          targetLocation: "/login",
+        });
+      } else {
+        this.openDialog({
+          message: "ユーザーの削除に失敗しました。",
+          success: false,
+        });
+      }
     },
   },
-});
+};
 </script>

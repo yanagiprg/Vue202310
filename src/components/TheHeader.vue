@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-blue-500 p-4 shadow-md">
+  <header class="bg-blue-500 opacity-90 p-4 shadow-md w-full fixed top-0">
     <nav
       class="container mx-auto text-white font-semibold flex justify-center items-center"
     >
@@ -40,9 +40,8 @@
 
 <script lang="ts">
 import { mapActions } from "vuex";
-import Vue from "vue";
 
-export default Vue.extend({
+export default {
   props: {
     authUser: Object,
   },
@@ -51,12 +50,24 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions("auth", ["logout"]),
+    ...mapActions("utils", ["openDialog"]),
     async logoutUser() {
-      await this.logout();
-      this.$router.push("/login");
+      const isLogout = await this.logout();
+      if (isLogout) {
+        this.openDialog({
+          message: "ログアウトしました",
+          success: true,
+          targetLocation: "/login",
+        });
+      } else {
+        this.openDialog({
+          message: "ログアウトに失敗しました。",
+          success: false,
+        });
+      }
     },
   },
-});
+};
 </script>
 
 <style lang="scss" scoped>

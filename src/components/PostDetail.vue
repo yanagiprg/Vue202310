@@ -22,60 +22,61 @@
         削除
       </button>
     </div>
-    <!-- Comments Section -->
-    <div v-if="pagedComments?.length" class="mt-10 max-w-2xl mx-auto">
-      <h3 class="text-xl font-semibold mb-4 border-b-2 border-gray-300 pb-2">
-        コメント
-      </h3>
-      <div
-        v-for="comment in comments"
-        :key="comment.id"
-        class="bg-white p-4 mb-6 rounded-lg shadow relative"
-      >
+    <div v-if="pagedComments?.length">
+      <!-- Comments Section -->
+      <div class="mt-10 max-w-2xl mx-auto">
+        <h3 class="text-xl font-semibold mb-4 border-b-2 border-gray-300 pb-2">
+          コメント
+        </h3>
         <div
-          v-if="authUser && authUser.uid === comment.userId"
-          class="absolute top-2 right-2"
+          v-for="comment in pagedComments"
+          :key="comment.id"
+          class="bg-white p-4 mb-6 rounded-lg shadow relative"
         >
-          <button
-            @click.prevent="removeComment(comment.id)"
-            class="text-red-500 hover:text-red-600"
+          <div
+            v-if="authUser && authUser.uid === comment.userId"
+            class="absolute top-2 right-2"
           >
-            <span class="material-icons">delete</span>
-          </button>
-        </div>
-
-        <p class="text-gray-700 mb-2 border-b pb-2">{{ comment.content }}</p>
-        <div class="flex justify-between items-center mt-2">
-          <div class="flex">
-            <span class="material-icons text-gray-500 mr-2">ユーザ名：</span>
-            <p class="text-gray-500 text-sm mr-4">{{ comment.userName }}</p>
+            <button
+              @click.prevent="removeComment(comment.id)"
+              class="text-red-500 hover:text-red-600"
+            >
+              <span class="material-icons">delete</span>
+            </button>
           </div>
-          <p class="text-gray-500 text-sm">
-            {{ formatJapaneseDate(comment.createdAt) }}
-          </p>
+
+          <p class="text-gray-700 mb-2 border-b pb-2">{{ comment.content }}</p>
+          <div class="flex justify-between items-center mt-2">
+            <div class="flex">
+              <span class="material-icons text-gray-500 mr-2">ユーザ名：</span>
+              <p class="text-gray-500 text-sm mr-4">{{ comment.userName }}</p>
+            </div>
+            <p class="text-gray-500 text-sm">
+              {{ formatJapaneseDate(comment.createdAt) }}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Pagination Controls for Comments -->
-    <div class="flex justify-center mt-6 items-center">
-      <button
-        :disabled="commentPage === 1"
-        @click="prevCommentPage"
-        class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-      >
-        前へ
-      </button>
-      <span class="mx-2">{{ commentPage }}/{{ totalCommentPages }}</span>
-      <button
-        :disabled="commentPage === totalCommentPages"
-        @click="nextCommentPage"
-        class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-      >
-        次へ
-      </button>
+      <!-- Pagination Controls for Comments -->
+      <div class="flex justify-center mt-6 items-center">
+        <button
+          :disabled="commentPage === 1"
+          @click="prevCommentPage"
+          class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+        >
+          前へ
+        </button>
+        <span class="mx-2">{{ commentPage }}/{{ totalCommentPages }}</span>
+        <button
+          :disabled="commentPage === totalCommentPages"
+          @click="nextCommentPage"
+          class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+        >
+          次へ
+        </button>
+      </div>
     </div>
-
     <!-- Add Comment Form -->
     <div
       v-if="authUser"
@@ -108,7 +109,7 @@ export default {
     return {
       newComment: "",
       commentPage: 1,
-      commentsPerPage: 10,
+      commentsPerPage: 5,
     };
   },
   async created() {
@@ -135,10 +136,22 @@ export default {
       "addComment",
       "deleteComment",
     ]),
+    ...mapActions("utils", ["openDialog"]),
     async deletePost() {
       const postId = this.$route.params.id;
-      await this.removePost(postId);
-      this.$router.push("/");
+      const isDelete = await this.removePost(postId);
+      if (isDelete) {
+        this.openDialog({
+          message: "投稿を削除しました",
+          success: true,
+          targetLocation: "/",
+        });
+      } else {
+        this.openDialog({
+          message: "投稿の削除に失敗しました。",
+          success: false,
+        });
+      }
     },
     submitComment() {
       if (!this.newComment.trim()) return;
