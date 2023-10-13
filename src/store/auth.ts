@@ -128,6 +128,15 @@ const actions = {
       return false;
     }
   },
+  initAuth({ commit }) {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        commit("SET_AUTH_USER", user);
+      } else {
+        commit("SET_AUTH_USER", null);
+      }
+    });
+  },
   // async getUsers({ commit }) {
   //   try {
   //     const querySnapshot = await getDocs(collection(db, "users"));

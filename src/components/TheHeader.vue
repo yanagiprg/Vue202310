@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     ...mapActions("auth", ["logout"]),
-    ...mapActions("utils", ["openDialog", "setDialog"]),
+    ...mapActions("utils", ["openDialog", "setLoading"]),
     async logoutUser() {
       this.setLoading(true);
       const isLogout = await this.logout();
