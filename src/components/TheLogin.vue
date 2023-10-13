@@ -60,12 +60,14 @@ export default {
   },
   methods: {
     ...mapActions("auth", ["login", "loginWithGoogle"]),
-    ...mapActions("utils", ["openDialog"]),
+    ...mapActions("utils", ["openDialog", "setLoading"]),
     async signin() {
+      this.setLoading(true);
       const isLogin = await this.login({
         email: this.email,
         password: this.password,
       });
+      this.setLoading(false);
       if (isLogin) {
         this.openDialog({
           message: "ログインに成功しました！",
@@ -80,7 +82,9 @@ export default {
       }
     },
     async signinWithGoogle() {
+      this.setLoading(true);
       const isLogin = await this.loginWithGoogle();
+      this.setLoading(false);
       if (isLogin) {
         this.openDialog({
           message: "Googleアカウントでのログインに成功しました！",

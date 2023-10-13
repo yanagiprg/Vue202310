@@ -136,10 +136,12 @@ export default {
       "addComment",
       "deleteComment",
     ]),
-    ...mapActions("utils", ["openDialog"]),
+    ...mapActions("utils", ["openDialog", "setLoading"]),
     async deletePost() {
+      this.setLoading(true);
       const postId = this.$route.params.id;
       const isDelete = await this.removePost(postId);
+      this.setLoading(false);
       if (isDelete) {
         this.openDialog({
           message: "投稿を削除しました",

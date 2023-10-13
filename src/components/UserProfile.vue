@@ -80,10 +80,12 @@ export default {
   },
   methods: {
     ...mapActions("auth", ["updateAuthUser", "deleteAuthUser"]),
-    ...mapActions("utils", ["openDialog"]),
-    updateProfile() {
+    ...mapActions("utils", ["openDialog", "setLoading"]),
+    async updateProfile() {
+      this.setLoading(true);
       this.user.displayName = this.newDisplayName;
-      const isUpdate = this.updateAuthUser(this.user);
+      const isUpdate = await this.updateAuthUser(this.user);
+      this.setLoading(false);
       if (isUpdate) {
         this.openDialog({
           message: "ユーザー情報を更新しました",
@@ -98,8 +100,10 @@ export default {
       }
       this.editMode = false;
     },
-    removeUser() {
-      const isDelete = this.deleteAuthUser();
+    async removeUser() {
+      this.setLoading(true);
+      const isDelete = await this.deleteAuthUser();
+      this.setLoading(false);
       if (isDelete) {
         this.openDialog({
           message: "ユーザーを削除しました",
