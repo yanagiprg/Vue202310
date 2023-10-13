@@ -50,12 +50,14 @@ export default {
   },
   methods: {
     ...mapActions("posts", ["updatePost", "getPostById"]),
-    ...mapActions("utils", ["openDialog"]),
+    ...mapActions("utils", ["openDialog", "setLoading"]),
     async fetchPost() {
       this.post = await this.getPostById(this.post.id);
     },
     async handleUpdatePost() {
+      this.setLoading(true);
       const isUpdate = await this.updatePost(this.post);
+      this.setLoading(false);
       if (isUpdate) {
         this.openDialog({
           message: "投稿を更新しました",

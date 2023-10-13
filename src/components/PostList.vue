@@ -106,7 +106,7 @@ export default {
       sortOrder: SORT_ORDERS.TITLE,
       showUserPosts: false,
       currentPage: 1,
-      postsPerPage: 10,
+      postsPerPage: 5,
     };
   },
   async created() {

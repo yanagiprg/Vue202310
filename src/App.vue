@@ -8,6 +8,7 @@
       :message="dialogMessage"
       @dialogClosed="navigateToLocation"
     />
+    <loading-component v-if="isLoading" />
   </div>
 </template>
 
@@ -15,11 +16,13 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import TheHeader from "@/components/TheHeader.vue";
 import DialogComponent from "@/components/shared/DialogComponent.vue";
+import LoadingComponent from "@/components/shared/LoadingComponent.vue";
 
 export default {
   components: {
     TheHeader,
     DialogComponent,
+    LoadingComponent,
   },
   computed: {
     ...mapState("auth", ["authUser"]),
@@ -29,6 +32,7 @@ export default {
       "dialogIsSuccess",
       "targetLocation",
     ]),
+    ...mapState("utils", ["isLoading"]),
   },
   methods: {
     ...mapActions("utils", ["closeDialog"]),

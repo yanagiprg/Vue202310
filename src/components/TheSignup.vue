@@ -60,13 +60,15 @@ export default {
   },
   methods: {
     ...mapActions("auth", ["signup"]),
-    ...mapActions("utils", ["openDialog"]),
+    ...mapActions("utils", ["openDialog", "setLoading"]),
     async signupUser() {
+      this.setLoading(true);
       const isSignup = await this.signup({
         displayName: this.displayName,
         email: this.email,
         password: this.password,
       });
+      this.setLoading(false);
       if (isSignup) {
         this.openDialog({
           message: "ユーザー登録に成功しました",

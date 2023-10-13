@@ -3,6 +3,7 @@ const state = {
   dialogMessage: "",
   dialogIsSuccess: true,
   targetLocation: "",
+  isLoading: false,
 };
 const getters = {
   showDialog: (state) => state.showDialog,
@@ -22,6 +23,9 @@ const mutations = {
     state.dialogMessage = "";
     state.targetLocation = "";
   },
+  SET_LOADING(state, isLoading) {
+    state.isLoading = isLoading;
+  },
 };
 
 const actions = {
@@ -30,6 +34,9 @@ const actions = {
   },
   closeDialog({ commit }) {
     commit("CLOSE_DIALOG");
+  },
+  setLoading({ commit }, isLoading) {
+    commit("SET_LOADING", isLoading);
   },
 };
 
