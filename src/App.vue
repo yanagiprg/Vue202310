@@ -24,6 +24,9 @@ export default {
     DialogComponent,
     LoadingComponent,
   },
+  created() {
+    this.initAuth();
+  },
   computed: {
     ...mapState("auth", ["authUser"]),
     ...mapGetters("utils", [
@@ -36,6 +39,7 @@ export default {
   },
   methods: {
     ...mapActions("utils", ["closeDialog"]),
+    ...mapActions("auth", ["initAuth"]),
     navigateToLocation() {
       if (this.targetLocation) {
         this.$router.push(this.targetLocation);
