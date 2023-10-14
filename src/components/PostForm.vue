@@ -35,6 +35,14 @@
             required
           ></textarea>
         </div>
+        <div class="mb-4">
+          <label
+            for="image"
+            class="block text-gray-600 text-sm font-medium mb-2"
+            >画像</label
+          >
+          <input type="file" @change="onFileChange" />
+        </div>
         <div class="text-right">
           <button
             type="submit"
@@ -60,11 +68,13 @@ export default {
       post: {
         title: "",
         content: "",
+        imageUrl: "",
         userId: "",
         userName: "",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      image: null,
     };
   },
   created() {
@@ -73,18 +83,39 @@ export default {
   },
   methods: {
     ...mapActions("posts", ["createPost"]),
+    ...mapActions("utils", ["openDialog", "setLoading"]),
     resetPost() {
       this.post.title = "";
       this.post.content = "";
+      this.image = null;
     },
-    addPost() {
+    async addPost() {
       if (this.post.title && this.post.content && this.authUser) {
-        this.createPost(this.post);
+        this.setLoading(true);
+        const isPost = await this.createPost({
+          post: this.post,
+          image: this.image,
+        });
+        this.setLoading(false);
         this.resetPost();
-        this.$router.push("/");
+        if (isPost) {
+          this.openDialog({
+            message: "投稿しました",
+            success: true,
+            targetLocation: "/",
+          });
+        } else {
+          this.openDialog({
+            message: "投稿に失敗しました",
+            success: false,
+          });
+        }
       } else {
         alert("タイトルと内容を入力してください");
       }
+    },
+    onFileChange(event) {
+      this.image = event.target.files[0];
     },
   },
 };

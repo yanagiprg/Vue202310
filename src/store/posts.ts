@@ -9,6 +9,14 @@ import {
   getDocs,
   getDoc,
 } from "firebase/firestore";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+
+const storage = getStorage();
 
 const state = {
   posts: [],
@@ -22,7 +30,9 @@ const mutations = {
     state.posts = posts;
   },
   EDIT_POST(state, editedPost) {
-    const index = state.posts.findIndex((post) => post.id === editedPost.id);
+    const index = state.posts.findIndex(
+      (post: Article) => post.id === editedPost.id
+    );
     if (index !== -1) {
       state.posts[index] = editedPost;
     }
@@ -58,9 +68,36 @@ const actions = {
       console.error("Error fetching posts: ", error);
     }
   },
-  async createPost({ dispatch }, post: Article) {
+  async uploadImage(_, image: File) {
+    const storageRef = ref(storage, "posts/" + image.name);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+    return new Promise<string>((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          console.error("Error uploading file: ", error);
+          reject(error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          console.log("File available at", downloadURL);
+          resolve(downloadURL);
+        }
+      );
+    });
+  },
+  async createPost({ dispatch }, postData: { post: Article; image: File }) {
     try {
-      await addDoc(collection(db, "posts"), post);
+      if (postData.image) {
+        const imageUrl = await dispatch("uploadImage", postData.image);
+        postData.post.imageUrl = imageUrl;
+      }
+      await addDoc(collection(db, "posts"), postData.post);
       dispatch("getPosts");
       return true;
     } catch (error) {
@@ -68,12 +105,19 @@ const actions = {
       return false;
     }
   },
-  async updatePost({ commit }, post: Article) {
-    if (!post.id) return;
-    const postRef = doc(db, "posts", post.id);
+  async updatePost(
+    { commit, dispatch },
+    postData: { post: Article; image: File }
+  ) {
+    if (!postData.post.id) return;
+    const postRef = doc(db, "posts", postData.post.id);
+    if (postData.image) {
+      const imageUrl = await dispatch("uploadImage", postData.image);
+      postData.post.imageUrl = imageUrl;
+    }
     try {
-      await setDoc(postRef, post);
-      commit("EDIT_POST", post);
+      await setDoc(postRef, postData.post);
+      commit("EDIT_POST", postData.post);
       return true;
     } catch (error) {
       console.error("Error updating post: ", error);
@@ -126,7 +170,10 @@ const actions = {
       console.error("Error fetching comments: ", error);
     }
   },
-  async addComment({ dispatch }, { postId, comment }) {
+  async addComment(
+    { dispatch },
+    { postId, comment }: { postId: string; comment: Comment }
+  ) {
     try {
       const postRef = doc(db, "posts", postId);
       const commentsCollectionRef = collection(postRef, "comments");

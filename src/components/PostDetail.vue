@@ -1,6 +1,11 @@
 <template>
   <div class="post-detail bg-gray-100 min-h-screen py-6">
     <div class="max-w-2xl mx-auto">
+      <img
+        :src="post.imageUrl || 'path/to/default/image.jpg'"
+        alt="Article Image"
+        class="w-full h-48 object-contain mb-3"
+      />
       <h2 class="text-2xl font-semibold mb-4">{{ post.title }}</h2>
       <p class="text-gray-700">{{ post.content }}</p>
       <p class="text-gray-500 text-sm mt-2">作成者: {{ post.userName }}</p>
