@@ -1,6 +1,9 @@
 <template>
   <div class="bg-gray-100 min-h-screen py-6">
-    <form @submit.prevent="handleUpdatePost" class="max-w-2xl mx-auto">
+    <form
+      @submit.prevent="handleUpdatePost"
+      class="max-w-2xl mx-auto bg-white border border-blue-300 p-8"
+    >
       <div class="mb-4">
         <input
           v-model="post.title"
@@ -18,6 +21,40 @@
           rows="6"
           required
         ></textarea>
+      </div>
+      <div class="mb-4">
+        <label
+          for="tagInput"
+          class="block text-gray-600 text-sm font-medium mb-2"
+          >タグ</label
+        >
+        <div class="flex items-center">
+          <input
+            v-model="tagInput"
+            id="tagInput"
+            name="tagInput"
+            type="text"
+            placeholder="タグを入力"
+            class="w-10/12 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+          />
+          <button
+            type="button"
+            @click="addTag"
+            class="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+          >
+            追加
+          </button>
+        </div>
+      </div>
+      <div class="mb-4">
+        <span
+          v-for="(tag, index) in post.tags"
+          :key="index"
+          class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
+        >
+          {{ tag }}
+          <span class="mx-1 cursor-pointer" @click="removeTag(index)">×</span>
+        </span>
       </div>
       <div class="mb-4">
         <label for="image" class="block text-gray-600 text-sm font-medium mb-2"
@@ -49,8 +86,10 @@ export default {
         content: "",
         imageUrl: "",
         updatedAt: new Date(),
+        tags: [],
       },
       image: null,
+      tagInput: "",
     };
   },
   async mounted() {
@@ -61,6 +100,7 @@ export default {
     ...mapActions("utils", ["openDialog", "setLoading"]),
     async fetchPost() {
       this.post = await this.getPostById(this.post.id);
+      this.tagInput = "";
     },
     async handleUpdatePost() {
       this.setLoading(true);
@@ -81,6 +121,15 @@ export default {
           success: false,
         });
       }
+    },
+    addTag() {
+      if (this.tagInput.trim() !== "") {
+        this.post.tags.push(this.tagInput.trim());
+        this.tagInput = "";
+      }
+    },
+    removeTag(index) {
+      this.post.tags.splice(index, 1);
     },
     onFileChange(event) {
       this.image = event.target.files[0];

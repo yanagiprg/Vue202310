@@ -45,6 +45,15 @@
           <p class="text-gray-600 overflow-ellipsis overflow-hidden h-14">
             {{ post.content }}
           </p>
+          <div class="mt-3">
+            <span
+              v-for="(tag, index) in post.tags"
+              :key="index"
+              class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
+            >
+              {{ tag }}
+            </span>
+          </div>
 
           <div
             class="flex justify-between items-center mt-5 pt-5 border-t border-gray-200"
