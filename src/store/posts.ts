@@ -16,8 +16,6 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 
-const storage = getStorage();
-
 const state = {
   posts: [],
   post: {},
@@ -69,6 +67,7 @@ const actions = {
     }
   },
   async uploadImage(_, image: File) {
+    const storage = getStorage();
     const storageRef = ref(storage, "posts/" + image.name);
     const uploadTask = uploadBytesResumable(storageRef, image);
     return new Promise<string>((resolve, reject) => {

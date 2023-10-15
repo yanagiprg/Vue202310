@@ -1,10 +1,27 @@
 <template>
   <div class="profile p-8 bg-gray-100 rounded-md w-full max-w-lg mx-auto mt-8">
     <div class="mb-8 bg-white p-6 rounded-md shadow-sm">
+      <div class="flex items-center justify-center mb-4">
+        <img
+          :src="authUser.photoURL"
+          alt="User Avatar"
+          class="w-24 h-24 rounded-full border border-gray-300 object-cover shadow"
+        />
+      </div>
+      <div class="mb-4 flex items-center pl-4 border-b">
+        <label class="block text-gray-700 font-medium mb-2 mr-4">
+          {{ editMode ? "New Profile Image:" : "" }}
+        </label>
+        <input
+          v-if="editMode"
+          @change="onFileChange"
+          type="file"
+          class="border rounded w-full p-2"
+        />
+      </div>
       <h2 class="text-xl font-semibold mb-4">
         {{ editMode ? "Edit Profile" : "User Profile" }}
       </h2>
-
       <div class="mb-4 flex items-center pl-4 border-b">
         <label class="block text-gray-700 font-medium mb-2 mr-4">{{
           editMode ? "New Display Name:" : "Display Name:"
@@ -13,7 +30,6 @@
           v-if="editMode"
           v-model="newDisplayName"
           type="text"
-          placeholder=""
           class="border rounded w-full p-2 h-6"
         />
         <p v-else class="pb-2">{{ authUser.displayName }}</p>
@@ -33,7 +49,7 @@
         </button>
         <button
           v-else
-          @click="editMode = true"
+          @click="editUser"
           class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
         >
           編集
@@ -65,9 +81,11 @@ export default {
     return {
       editMode: false,
       newDisplayName: "",
+      newProfileImage: null,
       user: {
-        displayName: "",
         authId: this.$route.params.id,
+        displayName: "",
+        photoURL: null,
         updatedAt: new Date(),
       },
     };
@@ -79,26 +97,40 @@ export default {
     },
   },
   methods: {
-    ...mapActions("auth", ["updateAuthUser", "deleteAuthUser"]),
+    ...mapActions("auth", ["updateAuthUser", "deleteAuthUser", "uploadImage"]),
     ...mapActions("utils", ["openDialog", "setLoading"]),
+    editUser() {
+      this.editMode = true;
+      this.newDisplayName = this.user.displayName;
+    },
     async updateProfile() {
-      this.setLoading(true);
-      this.user.displayName = this.newDisplayName;
-      const isUpdate = await this.updateAuthUser(this.user);
-      this.setLoading(false);
-      if (isUpdate) {
-        this.openDialog({
-          message: "ユーザー情報を更新しました",
-          success: true,
-          targetLocation: "",
-        });
+      if (this.newDisplayName) {
+        this.setLoading(true);
+        this.user.displayName = this.newDisplayName;
+        if (this.newProfileImage) {
+          const imageUrl = await this.uploadImage(this.newProfileImage);
+          this.user.photoURL = imageUrl;
+        }
+        const isUpdate = await this.updateAuthUser(this.user);
+        this.setLoading(false);
+        if (isUpdate) {
+          this.openDialog({
+            message: "ユーザー情報を更新しました",
+            success: true,
+            targetLocation: "",
+          });
+        } else {
+          this.openDialog({
+            message: "ユーザー情報の更新に失敗しました。",
+            success: false,
+          });
+        }
+        this.newDisplayName = "";
+        this.newProfileImage = null;
+        this.editMode = false;
       } else {
-        this.openDialog({
-          message: "ユーザー情報の更新に失敗しました。",
-          success: false,
-        });
+        alert("表示名を入力してください");
       }
-      this.editMode = false;
     },
     async removeUser() {
       this.setLoading(true);
@@ -116,6 +148,9 @@ export default {
           success: false,
         });
       }
+    },
+    onFileChange(event) {
+      this.newProfileImage = event.target.files[0];
     },
   },
 };
