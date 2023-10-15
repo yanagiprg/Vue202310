@@ -1,12 +1,20 @@
+export type AuthUser = {
+  uid: string;
+  email: string;
+  password: string;
+  displayName: string;
+  photoURL: string | null;
+};
 export type Article = {
   id: string;
   title: string;
   content: string;
+  image: File | null;
+  imageUrl: string;
   userId: string;
   userName: string;
   createdAt: Date;
   updatedAt: Date;
-  categories?: string[];
   tags?: string[];
 };
 export type Comment = {

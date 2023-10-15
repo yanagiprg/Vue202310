@@ -19,6 +19,12 @@
           required
         ></textarea>
       </div>
+      <div class="mb-4">
+        <label for="image" class="block text-gray-600 text-sm font-medium mb-2"
+          >画像</label
+        >
+        <input type="file" @change="onFileChange" />
+      </div>
       <div class="text-right">
         <button
           type="submit"
@@ -41,8 +47,10 @@ export default {
         id: this.$route.params.id,
         title: "",
         content: "",
+        imageUrl: "",
         updatedAt: new Date(),
       },
+      image: null,
     };
   },
   async mounted() {
@@ -56,7 +64,10 @@ export default {
     },
     async handleUpdatePost() {
       this.setLoading(true);
-      const isUpdate = await this.updatePost(this.post);
+      const isUpdate = await this.updatePost({
+        post: this.post,
+        image: this.image,
+      });
       this.setLoading(false);
       if (isUpdate) {
         this.openDialog({
@@ -70,6 +81,9 @@ export default {
           success: false,
         });
       }
+    },
+    onFileChange(event) {
+      this.image = event.target.files[0];
     },
   },
 };

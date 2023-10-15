@@ -9,19 +9,19 @@
           <input
             class="w-full p-2 border rounded-md"
             type="text"
-            v-model="displayName"
+            v-model="user.displayName"
           />
         </td>
       </tr>
       <tr>
-        <th class="text-left pb-4">メールアドレス</th>
+        <th class="text-left py-4">メールアドレス</th>
       </tr>
       <tr>
         <td>
           <input
             class="w-full p-2 border rounded-md"
             type="email"
-            v-model="email"
+            v-model="user.email"
           />
         </td>
       </tr>
@@ -33,8 +33,16 @@
           <input
             class="w-full p-2 border rounded-md"
             type="password"
-            v-model="password"
+            v-model="user.password"
           />
+        </td>
+      </tr>
+      <tr>
+        <th class="text-left py-4">プロフィール画像</th>
+      </tr>
+      <tr>
+        <td>
+          <input type="file" @change="onFileChange" />
         </td>
       </tr>
     </table>
@@ -53,9 +61,12 @@ import { mapActions } from "vuex";
 export default {
   data() {
     return {
-      displayName: "",
-      email: "",
-      password: "",
+      user: {
+        email: "",
+        password: "",
+        displayName: "",
+        photoURL: null,
+      },
     };
   },
   methods: {
@@ -63,11 +74,7 @@ export default {
     ...mapActions("utils", ["openDialog", "setLoading"]),
     async signupUser() {
       this.setLoading(true);
-      const isSignup = await this.signup({
-        displayName: this.displayName,
-        email: this.email,
-        password: this.password,
-      });
+      const isSignup = await this.signup(this.user);
       this.setLoading(false);
       if (isSignup) {
         this.openDialog({
@@ -81,6 +88,9 @@ export default {
           success: false,
         });
       }
+    },
+    async onFileChange(event) {
+      this.user.photoURL = event.target.files[0];
     },
   },
 };

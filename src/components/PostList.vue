@@ -34,6 +34,11 @@
         class="bg-white rounded-lg shadow-lg p-5 mb-5 hover:shadow-xl transition-shadow duration-300"
       >
         <router-link :to="`/post/${post.id}`">
+          <img
+            :src="post.imageUrl || 'path/to/default/image.jpg'"
+            alt="Article Image"
+            class="w-full h-48 object-contain mb-3"
+          />
           <h2 class="text-3xl font-bold mb-3 text-gray-800">
             {{ post.title }}
           </h2>
