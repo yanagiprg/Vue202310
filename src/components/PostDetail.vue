@@ -3,9 +3,9 @@
     <div class="max-w-2xl mx-auto bg-white p-8">
       <div class="mb-8">
         <img
-          :src="post.imageUrl || 'path/to/default/image.jpg'"
+          :src="post.imageUrl || `https://picsum.photos/seed/${post.id}/400`"
           alt="Article Image"
-          class="w-full h-48 object-contain mb-3"
+          class="w-full h-full object-cover mb-3"
         />
         <h2 class="text-2xl font-semibold mb-4">{{ post.title }}</h2>
         <p class="text-gray-700">{{ post.content }}</p>
