@@ -37,6 +37,39 @@
         </div>
         <div class="mb-4">
           <label
+            for="tagInput"
+            class="block text-gray-600 text-sm font-medium mb-2"
+            >タグ</label
+          >
+          <div class="flex items-center">
+            <input
+              v-model="tagInput"
+              id="tagInput"
+              name="tagInput"
+              type="text"
+              placeholder="タグを入力"
+              class="w-10/12 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+            />
+            <button
+              type="button"
+              @click="addTag"
+              class="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            >
+              追加
+            </button>
+          </div>
+          <div class="mt-2">
+            <span
+              v-for="(tag, index) in tags"
+              :key="index"
+              class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
+            >
+              {{ tag }}
+            </span>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label
             for="image"
             class="block text-gray-600 text-sm font-medium mb-2"
             >画像</label
@@ -74,6 +107,8 @@ export default {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      tagInput: "",
+      tags: [],
       image: null,
     };
   },
@@ -87,11 +122,21 @@ export default {
     resetPost() {
       this.post.title = "";
       this.post.content = "";
+      this.tagInput = "";
+      this.tags = [];
       this.image = null;
+    },
+    addTag() {
+      const newTag = this.tagInput.trim();
+      if (newTag) {
+        this.tags.push(newTag);
+        this.tagInput = "";
+      }
     },
     async addPost() {
       if (this.post.title && this.post.content && this.authUser) {
         this.setLoading(true);
+        this.post.tags = this.tags;
         const isPost = await this.createPost({
           post: this.post,
           image: this.image,

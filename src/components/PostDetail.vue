@@ -1,17 +1,28 @@
 <template>
   <div class="post-detail bg-gray-100 min-h-screen py-6">
-    <div class="max-w-2xl mx-auto">
-      <img
-        :src="post.imageUrl || 'path/to/default/image.jpg'"
-        alt="Article Image"
-        class="w-full h-48 object-contain mb-3"
-      />
-      <h2 class="text-2xl font-semibold mb-4">{{ post.title }}</h2>
-      <p class="text-gray-700">{{ post.content }}</p>
-      <p class="text-gray-500 text-sm mt-2">作成者: {{ post.userName }}</p>
-      <p v-if="post.updatedAt" class="text-gray-500 text-sm mt-2">
-        更新時間: {{ formatTimestamp(post.updatedAt) }}
-      </p>
+    <div class="max-w-2xl mx-auto bg-white p-8">
+      <div class="mb-8">
+        <img
+          :src="post.imageUrl || `https://picsum.photos/seed/${post.id}/400`"
+          alt="Article Image"
+          class="w-full h-full object-cover mb-3"
+        />
+        <h2 class="text-2xl font-semibold mb-4">{{ post.title }}</h2>
+        <p class="text-gray-700">{{ post.content }}</p>
+        <p class="text-gray-500 text-sm mt-2">作成者: {{ post.userName }}</p>
+        <p v-if="post.updatedAt" class="text-gray-500 text-sm mt-2">
+          更新時間: {{ formatTimestamp(post.updatedAt) }}
+        </p>
+        <div class="mt-3">
+          <span
+            v-for="(tag, index) in post.tags"
+            :key="index"
+            class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
+          >
+            {{ tag }}
+          </span>
+        </div>
+      </div>
       <router-link
         v-if="authUser && authUser.uid === post.userId"
         :to="`/post/${post.id}/edit`"

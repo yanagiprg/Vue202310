@@ -15,7 +15,7 @@ export type Article = {
   userName: string;
   createdAt: Date;
   updatedAt: Date;
-  tags?: string[];
+  tags?: Tag[];
 };
 export type Comment = {
   id: string;
@@ -23,6 +23,16 @@ export type Comment = {
   userId: string;
   userName: string;
   createdAt: Date;
+};
+export type Tag = {
+  id: string;
+  name: string;
+  posts: Article[];
+};
+export type ArticleTag = {
+  id: string;
+  articleId: string;
+  tagId: string;
 };
 // export type User = {
 //   id: string;

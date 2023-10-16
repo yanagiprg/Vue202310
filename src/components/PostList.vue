@@ -2,10 +2,9 @@
   <div class="bg-gray-100 min-h-screen py-6">
     <div class="max-w-2xl mx-auto">
       <h2 class="text-2xl font-semibold mb-4">ブログ一覧</h2>
-
       <!-- Filter & Sorting Controls -->
       <div
-        class="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow"
+        class="flex justify-between items-center mb-4 bg-white p-4 rounded-lg shadow"
       >
         <div class="flex items-center space-x-4">
           <button
@@ -13,7 +12,7 @@
             @click="filterByUser"
             class="text-blue-500 border border-blue-500 px-4 py-2 rounded hover:bg-blue-500 hover:text-white focus:outline-none transition-colors duration-200"
           >
-            {{ showUserPosts ? "全ての投稿" : "自分の投稿" }}
+            {{ isShowUserPosts ? "全ての投稿" : "自分の投稿" }}
           </button>
         </div>
         <div class="flex items-center space-x-2">
@@ -26,7 +25,24 @@
           </select>
         </div>
       </div>
-
+      <div class="mb-4">
+        <p class="text-lg font-medium mb-4">
+          記事の件数：{{
+            isShowUserPosts || selectedTag
+              ? paginatedPosts.length
+              : posts.length
+          }}
+        </p>
+        <span
+          v-if="selectedTag"
+          class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
+        >
+          タグ: {{ selectedTag }}
+          <span class="mx-1 cursor-pointer" @click.prevent="filterByTag(null)"
+            >✖︎</span
+          >
+        </span>
+      </div>
       <!-- Posts List -->
       <div
         v-for="post in paginatedPosts"
@@ -35,7 +51,7 @@
       >
         <router-link :to="`/post/${post.id}`">
           <img
-            :src="post.imageUrl || 'path/to/default/image.jpg'"
+            :src="post.imageUrl || `https://picsum.photos/seed/${post.id}/400`"
             alt="Article Image"
             class="w-full h-48 object-contain mb-3"
           />
@@ -45,6 +61,16 @@
           <p class="text-gray-600 overflow-ellipsis overflow-hidden h-14">
             {{ post.content }}
           </p>
+          <div class="mt-3">
+            <span
+              v-for="(tag, index) in post.tags"
+              :key="index"
+              class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2 cursor-default"
+              @click.prevent="filterByTag(tag)"
+            >
+              {{ tag }}
+            </span>
+          </div>
 
           <div
             class="flex justify-between items-center mt-5 pt-5 border-t border-gray-200"
@@ -109,57 +135,72 @@ export default {
   data() {
     return {
       sortOrder: SORT_ORDERS.TITLE,
-      showUserPosts: false,
+      isShowUserPosts: false,
       currentPage: 1,
       postsPerPage: 5,
+      selectedTag: null,
     };
   },
   async created() {
-    await this.getPosts();
-    await this.countComments();
+    await this.fetchInitialData();
   },
   computed: {
     ...mapState("posts", ["posts", "commentsCount"]),
     ...mapState("auth", ["authUser"]),
+    filteredPosts() {
+      let posts = this.isShowUserPosts
+        ? this.posts.filter((post) => post.userId === this.authUser.uid)
+        : this.posts;
+      if (this.selectedTag) {
+        posts = posts.filter((post) => post.tags?.includes(this.selectedTag));
+      }
+      return posts;
+    },
     sortedPosts() {
-      let sorted = [...this.posts];
-      switch (this.sortOrder) {
-        case SORT_ORDERS.UPDATED_AT:
-          sorted.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
-          break;
-        case SORT_ORDERS.COMMENTS_COUNT:
-          sorted.sort(
-            (a, b) =>
-              (this.commentsCount[b.id] || 0) - (this.commentsCount[a.id] || 0)
-          );
-          break;
-        case SORT_ORDERS.TITLE:
-          sorted.sort((a, b) => a.title.localeCompare(b.title));
-          break;
-        case SORT_ORDERS.USER_NAME:
-          sorted.sort((a, b) => a.userName.localeCompare(b.userName));
-          break;
-        default:
-          break;
-      }
-      if (this.showUserPosts) {
-        sorted = sorted.filter((post) => post.userId === this.authUser.uid);
-      }
-      return sorted;
+      return this.sortPosts(this.filteredPosts);
     },
     totalPages() {
-      return Math.ceil(this.posts.length / this.postsPerPage);
+      return Math.ceil(this.filteredPosts.length / this.postsPerPage);
     },
     paginatedPosts() {
-      const start = (this.currentPage - 1) * this.postsPerPage;
-      const end = this.currentPage * this.postsPerPage;
-      return this.sortedPosts.slice(start, end);
+      return this.paginatePosts(this.sortedPosts);
     },
   },
   methods: {
     ...mapActions("posts", ["getPosts", "countComments"]),
+    async fetchInitialData() {
+      await this.getPosts();
+      await this.countComments();
+    },
+    sortPosts(posts) {
+      let sorted = [...posts];
+      switch (this.sortOrder) {
+        case SORT_ORDERS.UPDATED_AT:
+          return sorted.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+        case SORT_ORDERS.COMMENTS_COUNT:
+          return sorted.sort(
+            (a, b) =>
+              (this.commentsCount[b.id] || 0) - (this.commentsCount[a.id] || 0)
+          );
+        case SORT_ORDERS.TITLE:
+          return sorted.sort((a, b) => a.title.localeCompare(b.title));
+        case SORT_ORDERS.USER_NAME:
+          return sorted.sort((a, b) => a.userName.localeCompare(b.userName));
+        default:
+          return posts;
+      }
+    },
+    paginatePosts(posts) {
+      const start = (this.currentPage - 1) * this.postsPerPage;
+      const end = this.currentPage * this.postsPerPage;
+      return posts.slice(start, end);
+    },
     filterByUser() {
-      this.showUserPosts = !this.showUserPosts;
+      this.selectedTag = null;
+      this.isShowUserPosts = !this.isShowUserPosts;
+    },
+    filterByTag(tag) {
+      this.selectedTag = tag;
     },
     formatTimestamp,
     next() {
