@@ -25,10 +25,24 @@
           </select>
         </div>
       </div>
-      <p class="text-lg font-medium mb-4">
-        記事の件数：{{ isShowUserPosts ? paginatedPosts.length : posts.length }}
-      </p>
-
+      <div class="mb-4">
+        <p class="text-lg font-medium mb-4">
+          記事の件数：{{
+            isShowUserPosts || selectedTag
+              ? paginatedPosts.length
+              : posts.length
+          }}
+        </p>
+        <span
+          v-if="selectedTag"
+          class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
+        >
+          タグ: {{ selectedTag }}
+          <span class="mx-1 cursor-pointer" @click.prevent="filterByTag(null)"
+            >✖︎</span
+          >
+        </span>
+      </div>
       <!-- Posts List -->
       <div
         v-for="post in paginatedPosts"
@@ -51,7 +65,8 @@
             <span
               v-for="(tag, index) in post.tags"
               :key="index"
-              class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
+              class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2 cursor-default"
+              @click.prevent="filterByTag(tag)"
             >
               {{ tag }}
             </span>
@@ -123,6 +138,7 @@ export default {
       isShowUserPosts: false,
       currentPage: 1,
       postsPerPage: 5,
+      selectedTag: null,
     };
   },
   async created() {
@@ -132,9 +148,13 @@ export default {
     ...mapState("posts", ["posts", "commentsCount"]),
     ...mapState("auth", ["authUser"]),
     filteredPosts() {
-      return this.isShowUserPosts
+      let posts = this.isShowUserPosts
         ? this.posts.filter((post) => post.userId === this.authUser.uid)
         : this.posts;
+      if (this.selectedTag) {
+        posts = posts.filter((post) => post.tags?.includes(this.selectedTag));
+      }
+      return posts;
     },
     sortedPosts() {
       return this.sortPosts(this.filteredPosts);
@@ -176,7 +196,11 @@ export default {
       return posts.slice(start, end);
     },
     filterByUser() {
+      this.selectedTag = null;
       this.isShowUserPosts = !this.isShowUserPosts;
+    },
+    filterByTag(tag) {
+      this.selectedTag = tag;
     },
     formatTimestamp,
     next() {
