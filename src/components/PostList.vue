@@ -39,16 +39,16 @@
 <script lang="ts">
 import { mapState, mapActions } from "vuex";
 
-import PaginationControls from "./PaginationControls.vue";
+import PaginationControls from "./shared/PaginationComponent.vue";
 import TagDisplay from "./TagDisplay.vue";
 import FilterSortingControls from "./FilterSortingControls.vue";
 import PostItem from "./PostItem.vue";
 
 const SORT_ORDERS = {
   UPDATED_AT: "updatedAt",
-  COMMENTS_COUNT: "commentsCount",
   TITLE: "title",
   USER_NAME: "userName",
+  COMMENTS_COUNT: "commentsCount",
 };
 
 export default {
@@ -60,7 +60,7 @@ export default {
   },
   data(): any {
     return {
-      sortOrder: SORT_ORDERS.TITLE,
+      sortOrder: SORT_ORDERS.UPDATED_AT,
       isShowUserPosts: false,
       currentPage: 1,
       postsPerPage: 5,

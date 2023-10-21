@@ -55,7 +55,7 @@ import { formatTimestamp } from "@/utils/formatTimestamp";
 export default {
   props: {
     post: Object,
-    commentsCount: Number,
+    commentsCount: Object,
   },
   methods: {
     filterByTag(tag) {

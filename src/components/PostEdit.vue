@@ -78,7 +78,7 @@
 import { mapActions } from "vuex";
 
 export default {
-  data() {
+  data(): any {
     return {
       post: {
         id: this.$route.params.id,

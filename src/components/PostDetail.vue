@@ -121,7 +121,7 @@ export default {
   props: {
     authUser: Object,
   },
-  data() {
+  data(): any {
     return {
       newComment: "",
       commentPage: 1,

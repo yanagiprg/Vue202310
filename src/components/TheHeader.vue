@@ -6,9 +6,6 @@
       <router-link class="px-3 py-2 rounded hover:bg-blue-700" to="/"
         >Home</router-link
       >
-      <router-link class="px-3 py-2 rounded hover:bg-blue-700" to="/about"
-        >About</router-link
-      >
       <router-link
         v-if="authUser"
         class="px-3 py-2 rounded hover:bg-blue-700"
@@ -45,7 +42,7 @@ export default {
   props: {
     authUser: Object,
   },
-  data() {
+  data(): any {
     return {};
   },
   methods: {
