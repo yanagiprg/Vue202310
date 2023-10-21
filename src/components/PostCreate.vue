@@ -24,13 +24,13 @@ export default {
   methods: {
     ...mapActions("posts", ["createPost"]),
     ...mapActions("utils", ["openDialog", "setLoading"]),
-    async addPost({ post, tags, image }) {
-      if (post.title && post.content && post.userId) {
+    async addPost(payload) {
+      if (payload.post.title && payload.post.content && payload.post.userId) {
         this.setLoading(true);
-        post.tags = tags;
+        payload.post.tags = payload.tags;
         const isPost = await this.createPost({
-          post,
-          image,
+          post: payload.post,
+          image: payload.image,
         });
         this.setLoading(false);
         if (isPost) {

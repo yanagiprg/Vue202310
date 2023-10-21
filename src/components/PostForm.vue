@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="handleSubmit">
+  <form name="post-form" @submit.prevent="handleSubmit">
     <div class="mb-4">
       <label for="title" class="block text-gray-600 text-sm font-medium mb-2"
         >タイトル</label
@@ -70,7 +70,7 @@
         type="submit"
         class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
       >
-        保存
+        {{ isEditMode ? "更新" : "投稿" }}
       </button>
     </div>
   </form>
@@ -80,6 +80,12 @@
 export default {
   props: {
     authUser: Object,
+    initialPost: Object,
+    initialTags: Array,
+    isEditMode: {
+      type: Boolean,
+      default: false,
+    },
   },
   data(): any {
     return {
@@ -98,8 +104,28 @@ export default {
     };
   },
   created() {
-    this.post.userId = this.authUser.uid;
-    this.post.userName = this.authUser.displayName;
+    if (this.authUser) {
+      this.post.userId = this.authUser.uid;
+      this.post.userName = this.authUser.displayName;
+    }
+  },
+  watch: {
+    initialPost: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.post = { ...newVal };
+        }
+      },
+    },
+    initialTags: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.tags = [...newVal];
+        }
+      },
+    },
   },
   methods: {
     addTag() {
@@ -115,7 +141,11 @@ export default {
         tags: this.tags,
         image: this.image,
       };
-      this.$emit("submit", payload);
+      if (this.isEditMode) {
+        this.$emit("update", payload);
+      } else {
+        this.$emit("submit", payload);
+      }
     },
     onFileChange(event) {
       this.image = event.target.files[0];

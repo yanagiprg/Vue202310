@@ -1,83 +1,24 @@
 <template>
   <div class="bg-gray-100 min-h-screen py-6">
-    <form
-      @submit.prevent="handleUpdatePost"
-      class="max-w-2xl mx-auto bg-white border border-blue-300 p-8"
-    >
-      <div class="mb-4">
-        <input
-          v-model="post.title"
-          id="title"
-          type="text"
-          class="text-2xl font-semibold w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-          required
-        />
-      </div>
-      <div class="mb-4">
-        <textarea
-          v-model="post.content"
-          id="content"
-          class="text-gray-700 w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-          rows="6"
-          required
-        ></textarea>
-      </div>
-      <div class="mb-4">
-        <label
-          for="tagInput"
-          class="block text-gray-600 text-sm font-medium mb-2"
-          >タグ</label
-        >
-        <div class="flex items-center">
-          <input
-            v-model="tagInput"
-            id="tagInput"
-            name="tagInput"
-            type="text"
-            placeholder="タグを入力"
-            class="w-10/12 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-          />
-          <button
-            type="button"
-            @click="addTag"
-            class="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-          >
-            追加
-          </button>
-        </div>
-      </div>
-      <div class="mb-4">
-        <span
-          v-for="(tag, index) in post.tags"
-          :key="index"
-          class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
-        >
-          {{ tag }}
-          <span class="mx-1 cursor-pointer" @click="removeTag(index)">×</span>
-        </span>
-      </div>
-      <div class="mb-4">
-        <label for="image" class="block text-gray-600 text-sm font-medium mb-2"
-          >画像</label
-        >
-        <input type="file" @change="onFileChange" />
-      </div>
-      <div class="text-right">
-        <button
-          type="submit"
-          class="mt-4 mr-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-        >
-          更新
-        </button>
-      </div>
-    </form>
+    <div class="max-w-2xl mx-auto bg-white border border-blue-300 p-8">
+      <post-form
+        :initialPost="post"
+        :initialTags="post.tags"
+        :isEditMode="true"
+        @update="handleUpdatePost"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import PostForm from "@/components/PostForm.vue";
 import { mapActions } from "vuex";
 
 export default {
+  components: {
+    PostForm,
+  },
   data(): any {
     return {
       post: {
@@ -88,8 +29,6 @@ export default {
         updatedAt: new Date(),
         tags: [],
       },
-      image: null,
-      tagInput: "",
     };
   },
   async mounted() {
@@ -99,14 +38,23 @@ export default {
     ...mapActions("posts", ["updatePost", "getPostById"]),
     ...mapActions("utils", ["openDialog", "setLoading"]),
     async fetchPost() {
-      this.post = await this.getPostById(this.post.id);
-      this.tagInput = "";
+      const fetchedPost = await this.getPostById(this.post.id);
+      if (fetchedPost) {
+        this.post = fetchedPost;
+      }
     },
-    async handleUpdatePost() {
+    async handleUpdatePost(payload) {
       this.setLoading(true);
       const isUpdate = await this.updatePost({
-        post: this.post,
-        image: this.image,
+        post: {
+          ...this.post,
+          title: payload.post.title,
+          content: payload.post.content,
+          imageUrl: payload.post.imageUrl,
+          updatedAt: new Date(),
+          tags: payload.tags,
+        },
+        image: payload.image,
       });
       this.setLoading(false);
       if (isUpdate) {
@@ -121,18 +69,6 @@ export default {
           success: false,
         });
       }
-    },
-    addTag() {
-      if (this.tagInput.trim() !== "") {
-        this.post.tags.push(this.tagInput.trim());
-        this.tagInput = "";
-      }
-    },
-    removeTag(index) {
-      this.post.tags.splice(index, 1);
-    },
-    onFileChange(event) {
-      this.image = event.target.files[0];
     },
   },
 };

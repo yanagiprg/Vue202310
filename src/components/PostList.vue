@@ -17,7 +17,11 @@
               : posts.length
           }}
         </p>
-        <tag-display :selectedTag="selectedTag" @clearTag="filterByTag(null)" />
+        <tag-display
+          v-if="selectedTag"
+          :selectedTag="selectedTag"
+          @clearTag="filterByTag(null)"
+        />
       </div>
       <post-item
         v-for="post in paginatedPosts"
