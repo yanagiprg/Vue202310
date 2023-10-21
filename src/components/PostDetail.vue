@@ -1,148 +1,48 @@
 <template>
   <div class="post-detail bg-gray-100 min-h-screen py-6">
-    <div class="max-w-2xl mx-auto bg-white p-8">
-      <div class="mb-8">
-        <img
-          :src="post.imageUrl || `https://picsum.photos/seed/${post.id}/400`"
-          alt="Article Image"
-          class="w-full h-full object-cover mb-3"
-        />
-        <h2 class="text-2xl font-semibold mb-4">{{ post.title }}</h2>
-        <p class="text-gray-700">{{ post.content }}</p>
-        <p class="text-gray-500 text-sm mt-2">作成者: {{ post.userName }}</p>
-        <p v-if="post.updatedAt" class="text-gray-500 text-sm mt-2">
-          更新時間: {{ formatTimestamp(post.updatedAt) }}
-        </p>
-        <div class="mt-3">
-          <span
-            v-for="(tag, index) in post.tags"
-            :key="index"
-            class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
-          >
-            {{ tag }}
-          </span>
-        </div>
-      </div>
-      <router-link
-        v-if="authUser && authUser.uid === post.userId"
-        :to="`/post/${post.id}/edit`"
-        class="mt-4 mr-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-      >
-        編集
-      </router-link>
-      <button
-        v-if="authUser && authUser.uid === post.userId"
-        @click.prevent="deletePost"
-        class="mt-4 ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
-      >
-        削除
-      </button>
-    </div>
-    <div v-if="pagedComments?.length">
-      <!-- Comments Section -->
-      <div class="mt-10 max-w-2xl mx-auto">
-        <h3 class="text-xl font-semibold mb-4 border-b-2 border-gray-300 pb-2">
-          コメント
-        </h3>
-        <div
-          v-for="comment in pagedComments"
-          :key="comment.id"
-          class="bg-white p-4 mb-6 rounded-lg shadow relative"
-        >
-          <div
-            v-if="authUser && authUser.uid === comment.userId"
-            class="absolute top-2 right-2"
-          >
-            <button
-              @click.prevent="removeComment(comment.id)"
-              class="text-red-500 hover:text-red-600"
-            >
-              <span class="material-icons">delete</span>
-            </button>
-          </div>
-
-          <p class="text-gray-700 mb-2 border-b pb-2">{{ comment.content }}</p>
-          <div class="flex justify-between items-center mt-2">
-            <div class="flex">
-              <span class="material-icons text-gray-500 mr-2">ユーザ名：</span>
-              <p class="text-gray-500 text-sm mr-4">{{ comment.userName }}</p>
-            </div>
-            <p class="text-gray-500 text-sm">
-              {{ formatJapaneseDate(comment.createdAt) }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pagination Controls for Comments -->
-      <div class="flex justify-center mt-6 items-center">
-        <button
-          :disabled="commentPage === 1"
-          @click="prevCommentPage"
-          class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-        >
-          前へ
-        </button>
-        <span class="mx-2">{{ commentPage }}/{{ totalCommentPages }}</span>
-        <button
-          :disabled="commentPage === totalCommentPages"
-          @click="nextCommentPage"
-          class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-        >
-          次へ
-        </button>
-      </div>
-    </div>
-    <!-- Add Comment Form -->
-    <div
+    <post-detail-card
+      v-if="post"
+      :post="post"
+      :authUser="authUser"
+      @deletePost="deletePost"
+    />
+    <comment-list
+      v-if="comments"
+      :comments="comments"
+      :authUser="authUser"
+      @deleteComment="removeComment"
+    />
+    <comment-create
       v-if="authUser"
-      class="mt-10 max-w-2xl mx-auto p-4 bg-white rounded shadow"
-    >
-      <textarea
-        v-model="newComment"
-        class="w-full p-2 rounded mb-4 border"
-        placeholder="コメントを入力..."
-      ></textarea>
-      <button
-        @click.prevent="submitComment"
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
-      >
-        コメントする
-      </button>
-    </div>
+      :authUser="authUser"
+      @submitComment="submitComment"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { mapState, mapActions } from "vuex";
-import { formatTimestamp, formatJapaneseDate } from "@/utils/formatTimestamp";
+import { formatTimestamp } from "@/utils/formatTimestamp";
+import CommentList from "./CommentList.vue";
+import CommentCreate from "./CommentCreate.vue";
+import PostDetailCard from "./PostDetailCard.vue";
 
 export default {
+  components: { CommentList, CommentCreate, PostDetailCard },
   props: {
     authUser: Object,
   },
   data(): any {
     return {
-      newComment: "",
-      commentPage: 1,
-      commentsPerPage: 5,
+      postId: this.$route.params.id,
     };
   },
   async created() {
-    const postId = this.$route.params.id;
-    await this.getPostById(postId);
-    await this.getComments(postId);
+    await this.getPostById(this.postId);
+    await this.getComments(this.postId);
   },
   computed: {
     ...mapState("posts", ["post", "comments"]),
-    pagedComments() {
-      const start = (this.commentPage - 1) * this.commentsPerPage;
-      const end = start + this.commentsPerPage;
-      return this.comments.slice(start, end);
-    },
-    totalCommentPages() {
-      return Math.ceil(this.comments.length / this.commentsPerPage);
-    },
   },
   methods: {
     ...mapActions("posts", [
@@ -153,10 +53,9 @@ export default {
       "deleteComment",
     ]),
     ...mapActions("utils", ["openDialog", "setLoading"]),
-    async deletePost() {
+    async deletePost(id) {
       this.setLoading(true);
-      const postId = this.$route.params.id;
-      const isDelete = await this.removePost(postId);
+      const isDelete = await this.removePost(id);
       this.setLoading(false);
       if (isDelete) {
         this.openDialog({
@@ -171,34 +70,13 @@ export default {
         });
       }
     },
-    submitComment() {
-      if (!this.newComment.trim()) return;
-
-      const comment = {
-        content: this.newComment,
-        userId: this.authUser.uid,
-        userName: this.authUser.displayName,
-        createdAt: new Date().toISOString(),
-      };
-
-      this.addComment({ postId: this.$route.params.id, comment });
-      this.newComment = "";
+    submitComment(comment) {
+      this.addComment({ postId: this.postId, comment });
     },
     removeComment(commentId) {
-      this.deleteComment({ postId: this.$route.params.id, commentId });
+      this.deleteComment({ postId: this.postId, commentId });
     },
     formatTimestamp,
-    formatJapaneseDate,
-    nextCommentPage() {
-      if (this.commentPage < this.totalCommentPages) {
-        this.commentPage += 1;
-      }
-    },
-    prevCommentPage() {
-      if (this.commentPage > 1) {
-        this.commentPage -= 1;
-      }
-    },
   },
 };
 </script>
