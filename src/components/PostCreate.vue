@@ -16,17 +16,7 @@ export default {
     PostForm,
   },
   data(): any {
-    return {
-      post: {
-        title: "",
-        content: "",
-        imageUrl: "",
-        userId: "",
-        userName: "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    };
+    return {};
   },
   computed: {
     ...mapState("auth", ["authUser"]),

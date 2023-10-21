@@ -116,9 +116,6 @@ export default {
       }
     },
     handleSubmit() {
-      console.log(this.post, "post");
-      console.log(this.tags, "tags");
-      console.log(this.image, "image");
       this.$emit("submit", {
         post: this.post,
         tags: this.tags,
@@ -128,7 +125,6 @@ export default {
     },
     onFileChange(event) {
       this.image = event.target.files[0];
-      this.post.imageUrl = event.target.files[0].name;
     },
   },
 };
