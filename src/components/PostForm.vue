@@ -1,102 +1,87 @@
 <template>
-  <div class="bg-gray-100 min-h-screen py-6">
-    <div class="max-w-2xl mx-auto bg-white rounded shadow-md p-6">
-      <h2 class="text-2xl font-semibold mb-4">記事投稿</h2>
-      <form @submit.prevent="addPost">
-        <div class="mb-4">
-          <label
-            for="title"
-            class="block text-gray-600 text-sm font-medium mb-2"
-            >タイトル</label
-          >
-          <input
-            v-model="post.title"
-            id="title"
-            name="title"
-            type="text"
-            placeholder="タイトルを入力"
-            class="w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-            required
-          />
-        </div>
-        <div class="mb-4">
-          <label
-            for="content"
-            class="block text-gray-600 text-sm font-medium mb-2"
-            >内容</label
-          >
-          <textarea
-            v-model="post.content"
-            id="content"
-            name="content"
-            placeholder="内容を入力"
-            class="w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-            rows="6"
-            required
-          ></textarea>
-        </div>
-        <div class="mb-4">
-          <label
-            for="tagInput"
-            class="block text-gray-600 text-sm font-medium mb-2"
-            >タグ</label
-          >
-          <div class="flex items-center">
-            <input
-              v-model="tagInput"
-              id="tagInput"
-              name="tagInput"
-              type="text"
-              placeholder="タグを入力"
-              class="w-10/12 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-            />
-            <button
-              type="button"
-              @click="addTag"
-              class="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-            >
-              追加
-            </button>
-          </div>
-          <div class="mt-2">
-            <span
-              v-for="(tag, index) in tags"
-              :key="index"
-              class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
-            >
-              {{ tag }}
-            </span>
-          </div>
-        </div>
-        <div class="mb-4">
-          <label
-            for="image"
-            class="block text-gray-600 text-sm font-medium mb-2"
-            >画像</label
-          >
-          <input type="file" @change="onFileChange" />
-        </div>
-        <div class="text-right">
-          <button
-            type="submit"
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-          >
-            保存
-          </button>
-        </div>
-      </form>
+  <form @submit.prevent="handleSubmit">
+    <div class="mb-4">
+      <label for="title" class="block text-gray-600 text-sm font-medium mb-2"
+        >タイトル</label
+      >
+      <input
+        v-model="post.title"
+        id="title"
+        name="title"
+        type="text"
+        placeholder="タイトルを入力"
+        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+        required
+      />
     </div>
-  </div>
+    <div class="mb-4">
+      <label for="content" class="block text-gray-600 text-sm font-medium mb-2"
+        >内容</label
+      >
+      <textarea
+        v-model="post.content"
+        id="content"
+        name="content"
+        placeholder="内容を入力"
+        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+        rows="6"
+        required
+      ></textarea>
+    </div>
+    <div class="mb-4">
+      <label for="tagInput" class="block text-gray-600 text-sm font-medium mb-2"
+        >タグ</label
+      >
+      <div class="flex items-center">
+        <input
+          v-model="tagInput"
+          id="tagInput"
+          name="tagInput"
+          type="text"
+          placeholder="タグを入力"
+          class="w-10/12 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+        />
+        <button
+          type="button"
+          @click="addTag"
+          class="ml-2 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+        >
+          追加
+        </button>
+      </div>
+      <div class="mt-2">
+        <span
+          v-for="(tag, index) in tags"
+          :key="index"
+          class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
+        >
+          {{ tag }}
+        </span>
+      </div>
+    </div>
+    <div class="mb-4">
+      <label for="image" class="block text-gray-600 text-sm font-medium mb-2"
+        >画像</label
+      >
+      <input id="image" type="file" @change="onFileChange" />
+    </div>
+    <div class="text-right">
+      <button
+        type="submit"
+        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+      >
+        保存
+      </button>
+    </div>
+  </form>
 </template>
 
-<script lang="">
-import { mapActions } from "vuex";
-
+<script lang="ts">
 export default {
   props: {
     authUser: Object,
   },
-  data() {
+  data(): any {
     return {
       post: {
         title: "",
@@ -117,12 +102,9 @@ export default {
     this.post.userName = this.authUser.displayName;
   },
   methods: {
-    ...mapActions("posts", ["createPost"]),
-    ...mapActions("utils", ["openDialog", "setLoading"]),
-    resetPost() {
+    resetForm() {
       this.post.title = "";
       this.post.content = "";
-      this.tagInput = "";
       this.tags = [];
       this.image = null;
     },
@@ -133,34 +115,20 @@ export default {
         this.tagInput = "";
       }
     },
-    async addPost() {
-      if (this.post.title && this.post.content && this.authUser) {
-        this.setLoading(true);
-        this.post.tags = this.tags;
-        const isPost = await this.createPost({
-          post: this.post,
-          image: this.image,
-        });
-        this.setLoading(false);
-        this.resetPost();
-        if (isPost) {
-          this.openDialog({
-            message: "投稿しました",
-            success: true,
-            targetLocation: "/",
-          });
-        } else {
-          this.openDialog({
-            message: "投稿に失敗しました",
-            success: false,
-          });
-        }
-      } else {
-        alert("タイトルと内容を入力してください");
-      }
+    handleSubmit() {
+      console.log(this.post, "post");
+      console.log(this.tags, "tags");
+      console.log(this.image, "image");
+      this.$emit("submit", {
+        post: this.post,
+        tags: this.tags,
+        image: this.image,
+      });
+      this.resetForm();
     },
     onFileChange(event) {
       this.image = event.target.files[0];
+      this.post.imageUrl = event.target.files[0].name;
     },
   },
 };

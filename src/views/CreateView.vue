@@ -1,19 +1,15 @@
 <template>
   <div>
-    <post-form :authUser="authUser" />
+    <post-create />
   </div>
 </template>
 
 <script lang="ts">
-import PostForm from "@/components/PostForm.vue";
-import { mapState } from "vuex";
+import PostCreate from "@/components/PostCreate.vue";
 
 export default {
   components: {
-    PostForm,
-  },
-  computed: {
-    ...mapState("auth", ["authUser"]),
+    PostCreate,
   },
 };
 </script>
