@@ -50,13 +50,11 @@
         </button>
       </div>
       <div class="mt-2">
-        <span
-          v-for="(tag, index) in tags"
-          :key="index"
-          class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
-        >
-          {{ tag }}
-        </span>
+        <tag-list
+          :tags="tags"
+          :is-edit-mode="isEditMode"
+          @removeTag="tags.splice($event, 1)"
+        />
       </div>
     </div>
     <div class="mb-4">
@@ -77,7 +75,10 @@
 </template>
 
 <script lang="ts">
+import TagList from "./TagList.vue";
+
 export default {
+  components: { TagList },
   props: {
     authUser: Object,
     initialPost: Object,

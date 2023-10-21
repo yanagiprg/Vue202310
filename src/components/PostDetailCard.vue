@@ -13,13 +13,7 @@
         更新時間: {{ formatTimestamp(post.updatedAt) }}
       </p>
       <div class="mt-3">
-        <span
-          v-for="(tag, index) in post.tags"
-          :key="index"
-          class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2"
-        >
-          {{ tag }}
-        </span>
+        <tag-list :tags="post.tags" />
       </div>
     </div>
     <router-link
@@ -42,13 +36,15 @@
 <script lang="ts">
 import { formatTimestamp } from "@/utils/formatTimestamp";
 
+import TagList from "./TagList.vue";
+
 export default {
+  components: {
+    TagList,
+  },
   props: {
     authUser: Object,
     post: Object,
-  },
-  data(): any {
-    return {};
   },
   methods: {
     async deletePost() {

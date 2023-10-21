@@ -15,14 +15,7 @@
         {{ post.content }}
       </p>
       <div class="">
-        <span
-          v-for="(tag, index) in post.tags"
-          :key="index"
-          class="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-sm mr-2 cursor-default"
-          @click.prevent="filterByTag(tag)"
-        >
-          {{ tag }}
-        </span>
+        <tag-list :tags="post.tags" @filterByTag="filterByTag" />
       </div>
 
       <div
@@ -51,8 +44,12 @@
 
 <script lang="ts">
 import { formatTimestamp } from "@/utils/formatTimestamp";
+import TagList from "./TagList.vue";
 
 export default {
+  components: {
+    TagList,
+  },
   props: {
     post: Object,
     commentsCount: Object,
