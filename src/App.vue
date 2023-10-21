@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { mapActions, mapGetters, mapState } from "vuex";
-import TheHeader from "@/components/TheHeader.vue";
+import TheHeader from "@/components/shared/TheHeader.vue";
 import DialogComponent from "@/components/shared/DialogComponent.vue";
 import LoadingComponent from "@/components/shared/LoadingComponent.vue";
 
