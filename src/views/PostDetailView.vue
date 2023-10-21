@@ -3,18 +3,18 @@
     <post-detail-card
       v-if="post"
       :post="post"
-      :authUser="authUser"
+      :authUser="this.authUser"
       @deletePost="deletePost"
     />
     <comment-list
       v-if="comments"
       :comments="comments"
-      :authUser="authUser"
+      :authUser="this.authUser"
       @deleteComment="removeComment"
     />
     <comment-create
-      v-if="authUser"
-      :authUser="authUser"
+      v-if="this.authUser"
+      :authUser="this.authUser"
       @submitComment="submitComment"
     />
   </div>
@@ -23,15 +23,12 @@
 <script lang="ts">
 import { mapState, mapActions } from "vuex";
 import { formatTimestamp } from "@/utils/formatTimestamp";
-import CommentList from "./CommentList.vue";
-import CommentCreate from "./CommentCreate.vue";
-import PostDetailCard from "./PostDetailCard.vue";
+import CommentList from "@/components/comment/CommentList.vue";
+import CommentCreate from "@/components/comment/CommentCreate.vue";
+import PostDetailCard from "@/components/post/PostDetailCard.vue";
 
 export default {
   components: { CommentList, CommentCreate, PostDetailCard },
-  props: {
-    authUser: Object,
-  },
   data(): any {
     return {
       postId: this.$route.params.id,
@@ -42,6 +39,7 @@ export default {
     await this.getComments(this.postId);
   },
   computed: {
+    ...mapState("auth", ["authUser"]),
     ...mapState("posts", ["post", "comments"]),
   },
   methods: {

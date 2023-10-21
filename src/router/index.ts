@@ -1,14 +1,14 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import HomeView from "../views/HomeView.vue";
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "posts",
-    component: HomeView,
+    name: "home",
+    component: () =>
+      import(/* webpackChunkName: "signup" */ "../views/PostListView.vue"),
   },
   {
     path: "/signup",
@@ -32,19 +32,21 @@ const routes: Array<RouteConfig> = [
     path: "/post/create",
     name: "post-create",
     component: () =>
-      import(/* webpackChunkName: "create-post" */ "../views/CreateView.vue"),
+      import(
+        /* webpackChunkName: "create-post" */ "../views/PostCreateView.vue"
+      ),
   },
   {
     path: "/post/:id",
     name: "post",
     component: () =>
-      import(/* webpackChunkName: "post" */ "../views/PostView.vue"),
+      import(/* webpackChunkName: "post" */ "../views/PostDetailView.vue"),
   },
   {
     path: "/post/:id/edit",
     name: "post-edit",
     component: () =>
-      import(/* webpackChunkName: "edit-post" */ "../views/EditView.vue"),
+      import(/* webpackChunkName: "edit-post" */ "../views/PostEditView.vue"),
   },
   {
     path: "/user",

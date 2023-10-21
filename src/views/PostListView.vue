@@ -2,7 +2,7 @@
   <div class="bg-gray-100 min-h-screen py-6">
     <div class="max-w-2xl mx-auto">
       <h2 class="text-2xl font-semibold mb-4">ブログ一覧</h2>
-      <filter-sorting-controls
+      <post-display-controller
         :authUser="authUser"
         :sortOrder="sortOrder"
         :isShowUserPosts="isShowUserPosts"
@@ -30,7 +30,7 @@
         :commentsCount="commentsCount"
         @filterByTag="filterByTag"
       />
-      <pagination-controls
+      <pagination-component
         :currentPage="currentPage"
         :totalPages="totalPages"
         @nextPage="next"
@@ -43,10 +43,10 @@
 <script lang="ts">
 import { mapState, mapActions } from "vuex";
 
-import PaginationControls from "./shared/PaginationComponent.vue";
-import TagDisplay from "./TagDisplay.vue";
-import FilterSortingControls from "./FilterSortingControls.vue";
-import PostItem from "./PostItem.vue";
+import PaginationComponent from "@/components/shared/PaginationComponent.vue";
+import TagDisplay from "@/components/tag/TagDisplay.vue";
+import PostDisplayController from "@/components/post/PostDisplayController.vue";
+import PostItem from "@/components/post/PostItem.vue";
 
 const SORT_ORDERS = {
   UPDATED_AT: "updatedAt",
@@ -58,9 +58,9 @@ const SORT_ORDERS = {
 export default {
   components: {
     TagDisplay,
-    FilterSortingControls,
+    PostDisplayController,
     PostItem,
-    PaginationControls,
+    PaginationComponent,
   },
   data(): any {
     return {

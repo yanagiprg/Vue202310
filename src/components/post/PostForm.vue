@@ -52,7 +52,7 @@
       <div class="mt-2">
         <tag-list
           :tags="tags"
-          :is-edit-mode="isEditMode"
+          :is-edit-tag="true"
           @removeTag="tags.splice($event, 1)"
         />
       </div>
@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import TagList from "./TagList.vue";
+import TagList from "../tag/TagList.vue";
 
 export default {
   components: { TagList },

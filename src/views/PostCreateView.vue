@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { mapActions, mapState } from "vuex";
-import PostForm from "./PostForm.vue";
+import PostForm from "@/components/post/PostForm.vue";
 
 export default {
   components: {

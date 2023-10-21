@@ -30,8 +30,6 @@ export const formatTimestamp = (timestamp: Timestamp): string => {
 export const formatJapaneseDate = (inputTimestamp) => {
   // Dateオブジェクトを生成
   const date = new Date(inputTimestamp);
-  // UTC+9時間を加えて日本時間に変換
-  date.setHours(date.getHours() + 9);
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();

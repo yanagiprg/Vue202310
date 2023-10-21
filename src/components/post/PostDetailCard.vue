@@ -36,7 +36,7 @@
 <script lang="ts">
 import { formatTimestamp } from "@/utils/formatTimestamp";
 
-import TagList from "./TagList.vue";
+import TagList from "../tag/TagList.vue";
 
 export default {
   components: {

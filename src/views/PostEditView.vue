@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import PostForm from "@/components/PostForm.vue";
+import PostForm from "@/components/post/PostForm.vue";
 import { mapActions } from "vuex";
 
 export default {

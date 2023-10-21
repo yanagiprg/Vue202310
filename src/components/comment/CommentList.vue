@@ -4,7 +4,6 @@
       <h3 class="text-xl font-semibold mb-4 border-b-2 border-gray-300 pb-2">
         コメント
       </h3>
-      <!-- コメント作成順(desc)の表示にする -->
       <comment-item
         v-for="comment in pagedComments"
         :key="comment.id"
@@ -23,8 +22,8 @@
 </template>
 
 <script lang="ts">
-import CommentItem from "@/components/CommentItem.vue";
-import PaginationComponent from "./shared/PaginationComponent.vue";
+import CommentItem from "@/components/comment/CommentItem.vue";
+import PaginationComponent from "../shared/PaginationComponent.vue";
 
 export default {
   components: {

@@ -8,7 +8,7 @@
     >
       {{ tag }}
       <span
-        v-if="isEditMode"
+        v-if="isEditTag"
         class="mx-1 cursor-pointer"
         @click.prevent="removeTag(index)"
         >✖︎</span
@@ -21,7 +21,7 @@
 export default {
   props: {
     tags: Array,
-    isEditMode: {
+    isEditTag: {
       type: Boolean,
       default: false,
     },
