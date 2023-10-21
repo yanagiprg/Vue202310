@@ -102,12 +102,6 @@ export default {
     this.post.userName = this.authUser.displayName;
   },
   methods: {
-    resetForm() {
-      this.post.title = "";
-      this.post.content = "";
-      this.tags = [];
-      this.image = null;
-    },
     addTag() {
       const newTag = this.tagInput.trim();
       if (newTag) {
@@ -116,12 +110,12 @@ export default {
       }
     },
     handleSubmit() {
-      this.$emit("submit", {
+      const payload = {
         post: this.post,
         tags: this.tags,
         image: this.image,
-      });
-      this.resetForm();
+      };
+      this.$emit("submit", payload);
     },
     onFileChange(event) {
       this.image = event.target.files[0];

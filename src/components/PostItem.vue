@@ -11,10 +11,10 @@
       <h2 class="text-3xl font-bold mb-3 text-gray-800">
         {{ post.title }}
       </h2>
-      <p class="text-gray-600 overflow-ellipsis overflow-hidden h-14">
+      <p class="text-gray-600 overflow-ellipsis overflow-hidden h-8">
         {{ post.content }}
       </p>
-      <div class="mt-3">
+      <div class="">
         <span
           v-for="(tag, index) in post.tags"
           :key="index"
