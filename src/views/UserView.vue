@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="profile p-8 bg-gray-100 rounded-md w-full max-w-lg mx-auto mt-header"
-  >
+  <div class="profile p-8 bg-gray-100 rounded-md w-full max-w-lg mx-auto">
     <div class="mb-8 bg-white p-6 rounded-md shadow-sm">
       <div class="flex items-center justify-center mb-4">
         <img

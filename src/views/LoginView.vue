@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="signin p-8 bg-white shadow-lg rounded-lg w-full max-w-md mx-auto mt-8"
-  >
+  <div class="signin p-8 bg-white shadow-lg rounded-lg w-full max-w-md mx-auto">
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="email"
         >メールアドレス</label

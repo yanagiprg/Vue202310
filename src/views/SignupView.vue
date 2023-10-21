@@ -1,5 +1,5 @@
 <template>
-  <div class="signup p-8 bg-gray-100 rounded-md w-full max-w-md mx-auto mt-8">
+  <div class="signup p-8 bg-gray-100 rounded-md w-full max-w-md mx-auto">
     <table class="w-full">
       <tr>
         <th class="text-left pb-4">ユーザーネーム</th>
