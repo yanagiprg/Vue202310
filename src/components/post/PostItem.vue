@@ -42,23 +42,23 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+import { defineProps, defineEmits } from "vue";
 import { formatTimestamp } from "@/utils/formatTimestamp";
 import TagList from "../tag/TagList.vue";
 
-export default {
-  components: {
-    TagList,
+const emits = defineEmits(["filterByTag"]);
+defineProps({
+  post: {
+    type: Object,
+    required: true,
   },
-  props: {
-    post: Object,
-    commentsCount: Object,
+  commentsCount: {
+    type: Object,
+    required: true,
   },
-  methods: {
-    filterByTag(tag) {
-      this.$emit("filterByTag", tag);
-    },
-    formatTimestamp,
-  },
+});
+const filterByTag = (tag: string) => {
+  emits("filterByTag", tag);
 };
 </script>

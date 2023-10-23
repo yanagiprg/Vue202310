@@ -40,13 +40,15 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapState, mapActions } from "vuex";
-
+<script lang="ts" setup>
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
 import PaginationComponent from "@/components/shared/PaginationComponent.vue";
 import TagDisplay from "@/components/tag/TagDisplay.vue";
 import PostDisplayController from "@/components/post/PostDisplayController.vue";
 import PostItem from "@/components/post/PostItem.vue";
+
+const store = useStore();
 
 const SORT_ORDERS = {
   UPDATED_AT: "updatedAt",
@@ -55,93 +57,80 @@ const SORT_ORDERS = {
   COMMENTS_COUNT: "commentsCount",
 };
 
-export default {
-  components: {
-    TagDisplay,
-    PostDisplayController,
-    PostItem,
-    PaginationComponent,
-  },
-  data(): any {
-    return {
-      sortOrder: SORT_ORDERS.UPDATED_AT,
-      isShowUserPosts: false,
-      currentPage: 1,
-      postsPerPage: 5,
-      selectedTag: null,
-    };
-  },
-  async created() {
-    await this.fetchInitialData();
-  },
-  computed: {
-    ...mapState("posts", ["posts", "commentsCount"]),
-    ...mapState("auth", ["authUser"]),
-    filteredPosts() {
-      let posts = this.isShowUserPosts
-        ? this.posts.filter((post) => post.userId === this.authUser.uid)
-        : this.posts;
-      if (this.selectedTag) {
-        posts = posts.filter((post) => post.tags?.includes(this.selectedTag));
-      }
-      return posts;
-    },
-    sortedPosts() {
-      return this.sortPosts(this.filteredPosts);
-    },
-    totalPages() {
-      return Math.ceil(this.filteredPosts.length / this.postsPerPage);
-    },
-    paginatedPosts() {
-      return this.paginatePosts(this.sortedPosts);
-    },
-  },
-  methods: {
-    ...mapActions("posts", ["getPosts", "countComments"]),
-    async fetchInitialData() {
-      await this.getPosts();
-      await this.countComments();
-    },
-    sortPosts(posts) {
-      let sorted = [...posts];
-      switch (this.sortOrder) {
-        case SORT_ORDERS.UPDATED_AT:
-          return sorted.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
-        case SORT_ORDERS.COMMENTS_COUNT:
-          return sorted.sort(
-            (a, b) =>
-              (this.commentsCount[b.id] || 0) - (this.commentsCount[a.id] || 0)
-          );
-        case SORT_ORDERS.TITLE:
-          return sorted.sort((a, b) => a.title.localeCompare(b.title));
-        case SORT_ORDERS.USER_NAME:
-          return sorted.sort((a, b) => a.userName.localeCompare(b.userName));
-        default:
-          return posts;
-      }
-    },
-    paginatePosts(posts) {
-      const start = (this.currentPage - 1) * this.postsPerPage;
-      const end = this.currentPage * this.postsPerPage;
-      return posts.slice(start, end);
-    },
-    filterByUser() {
-      this.selectedTag = null;
-      this.isShowUserPosts = !this.isShowUserPosts;
-    },
-    filterByTag(tag) {
-      this.selectedTag = tag;
-    },
-    next() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-      }
-    },
-    previous() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-      }
-    },
-  },
+const sortOrder = ref(SORT_ORDERS.UPDATED_AT);
+const isShowUserPosts = ref(false);
+const currentPage = ref(1);
+const postsPerPage = ref(5);
+const selectedTag = ref(null);
+
+onMounted(async () => {
+  await store.dispatch("posts/getPosts");
+  await store.dispatch("posts/countComments");
+});
+
+const posts = computed(() => store.state.posts.posts);
+const commentsCount = computed(() => store.state.posts.commentsCount);
+const authUser = computed(() => store.state.auth.authUser);
+
+const filteredPosts = computed(() => {
+  let filtered = isShowUserPosts.value
+    ? posts.value.filter((post) => post.userId === authUser.value.uid)
+    : posts.value;
+  if (selectedTag.value) {
+    filtered = filtered.filter((post) =>
+      post.tags?.includes(selectedTag.value)
+    );
+  }
+  return filtered;
+});
+
+const sortedPosts = computed(() => {
+  let sorted = [...filteredPosts.value];
+  switch (sortOrder.value) {
+    case SORT_ORDERS.UPDATED_AT:
+      return sorted.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+    case SORT_ORDERS.COMMENTS_COUNT:
+      return sorted.sort(
+        (a, b) =>
+          (commentsCount.value[b.id] || 0) - (commentsCount.value[a.id] || 0)
+      );
+    case SORT_ORDERS.TITLE:
+      return sorted.sort((a, b) => a.title.localeCompare(b.title));
+    case SORT_ORDERS.USER_NAME:
+      return sorted.sort((a, b) => a.userName.localeCompare(b.userName));
+    default:
+      return filteredPosts.value;
+  }
+});
+
+const totalPages = computed(() =>
+  Math.ceil(filteredPosts.value.length / postsPerPage.value)
+);
+
+const paginatedPosts = computed(() => {
+  const start = (currentPage.value - 1) * postsPerPage.value;
+  const end = currentPage.value * postsPerPage.value;
+  return sortedPosts.value.slice(start, end);
+});
+
+const filterByUser = () => {
+  selectedTag.value = null;
+  isShowUserPosts.value = !isShowUserPosts.value;
+};
+
+const filterByTag = (tag) => {
+  selectedTag.value = tag;
+};
+
+const next = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const previous = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
 };
 </script>
