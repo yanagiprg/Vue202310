@@ -25,28 +25,39 @@ export default {
     ...mapActions("posts", ["createPost"]),
     ...mapActions("utils", ["openDialog", "setLoading"]),
     async addPost(payload) {
-      if (payload.post.title && payload.post.content && payload.post.userId) {
-        this.setLoading(true);
-        payload.post.tags = payload.tags;
-        const isPost = await this.createPost({
-          post: payload.post,
-          image: payload.image,
-        });
-        this.setLoading(false);
-        if (isPost) {
-          this.openDialog({
-            message: "投稿しました",
-            success: true,
-            targetLocation: "/",
-          });
-        } else {
-          this.openDialog({
-            message: "投稿に失敗しました",
-            success: false,
-          });
-        }
-      } else {
+      if (!payload || !payload.post) {
+        console.error("無効なペイロード:", payload);
+        return;
+      }
+      if (!payload.post.title || !payload.post.content) {
+        console.error("必要な投稿プロパティが不足しています:", payload.post);
         alert("タイトルと内容を入力してください");
+        return;
+      }
+      if (!payload.post.userId) {
+        console.error("ユーザーIDがありません:", payload.post);
+        return;
+      }
+
+      this.setLoading(true);
+      payload.post.tags = payload.tags;
+      const isPost = await this.createPost({
+        post: payload.post,
+        image: payload.image,
+      });
+      this.setLoading(false);
+
+      if (isPost) {
+        this.openDialog({
+          message: "投稿しました",
+          success: true,
+          targetLocation: "/",
+        });
+      } else {
+        this.openDialog({
+          message: "投稿に失敗しました",
+          success: false,
+        });
       }
     },
   },

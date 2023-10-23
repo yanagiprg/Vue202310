@@ -74,83 +74,79 @@
   </form>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import TagList from "../tag/TagList.vue";
+import { defineEmits, defineProps, ref, watch } from "vue";
 
-export default {
-  components: { TagList },
-  props: {
-    authUser: Object,
-    initialPost: Object,
-    initialTags: Array,
-    isEditMode: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data(): any {
-    return {
-      post: {
-        title: "",
-        content: "",
-        imageUrl: "",
-        userId: "",
-        userName: "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      tagInput: "",
-      tags: [],
-      image: null,
-    };
-  },
-  created() {
-    if (this.authUser) {
-      this.post.userId = this.authUser.uid;
-      this.post.userName = this.authUser.displayName;
+import { Article } from "@/types/types";
+
+const emit = defineEmits(["submit", "update"]);
+const props = defineProps({
+  authUser: Object,
+  initialPost: Object as () => Article,
+  initialTags: Array,
+  isEditMode: Boolean,
+});
+
+const post = ref({
+  title: "",
+  content: "",
+  imageUrl: "",
+  userId: "",
+  userName: "",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+});
+
+const tagInput = ref("");
+const tags = ref([]);
+const image = ref(null);
+
+if (props.authUser) {
+  post.value.userId = props.authUser.uid;
+  post.value.userName = props.authUser.displayName || "";
+}
+
+watch(
+  () => props.initialPost,
+  (newVal) => {
+    if (newVal) {
+      post.value = { ...newVal };
     }
-  },
-  watch: {
-    initialPost: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal) {
-          this.post = { ...newVal };
-        }
-      },
-    },
-    initialTags: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal) {
-          this.tags = [...newVal];
-        }
-      },
-    },
-  },
-  methods: {
-    addTag() {
-      const newTag = this.tagInput.trim();
-      if (newTag) {
-        this.tags.push(newTag);
-        this.tagInput = "";
-      }
-    },
-    handleSubmit() {
-      const payload = {
-        post: this.post,
-        tags: this.tags,
-        image: this.image,
-      };
-      if (this.isEditMode) {
-        this.$emit("update", payload);
-      } else {
-        this.$emit("submit", payload);
-      }
-    },
-    onFileChange(event) {
-      this.image = event.target.files[0];
-    },
-  },
+  }
+);
+
+watch(
+  () => props.initialTags,
+  (newVal) => {
+    if (newVal) {
+      tags.value = [...newVal];
+    }
+  }
+);
+
+const addTag = () => {
+  const newTag = tagInput.value.trim();
+  if (newTag) {
+    tags.value.push(newTag);
+    tagInput.value = "";
+  }
+};
+
+const handleSubmit = () => {
+  const payload = {
+    post: post.value,
+    tags: tags.value,
+    image: image.value,
+  };
+  if (props.isEditMode) {
+    emit("update", payload);
+  } else {
+    emit("submit", payload);
+  }
+};
+
+const onFileChange = (event) => {
+  image.value = event.target.files[0];
 };
 </script>
