@@ -36,37 +36,40 @@
 </template>
 
 <script lang="ts">
-import { mapActions } from "vuex";
+import { useStore } from "vuex";
+import { computed, defineComponent } from "vue";
 
-export default {
-  props: {
-    authUser: Object,
-  },
-  data(): any {
-    return {};
-  },
-  methods: {
-    ...mapActions("auth", ["logout"]),
-    ...mapActions("utils", ["openDialog", "setLoading"]),
-    async logoutUser() {
-      this.setLoading(true);
-      const isLogout = await this.logout();
-      this.setLoading(false);
+export default defineComponent({
+  setup() {
+    const store = useStore();
+
+    const authUser = computed(() => store.state.auth.authUser);
+
+    const logoutUser = async () => {
+      store.dispatch("utils/setLoading", true);
+      const isLogout = await store.dispatch("auth/logout");
+      store.dispatch("utils/setLoading", false);
+
       if (isLogout) {
-        this.openDialog({
+        store.dispatch("utils/openDialog", {
           message: "ログアウトしました",
           success: true,
           targetLocation: "/login",
         });
       } else {
-        this.openDialog({
+        store.dispatch("utils/openDialog", {
           message: "ログアウトに失敗しました。",
           success: false,
         });
       }
-    },
+    };
+
+    return {
+      authUser,
+      logoutUser,
+    };
   },
-};
+});
 </script>
 
 <style lang="scss" scoped>

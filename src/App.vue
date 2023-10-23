@@ -13,41 +13,55 @@
 </template>
 
 <script lang="ts">
-import { mapActions, mapGetters, mapState } from "vuex";
+import { defineComponent, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 import TheHeader from "@/components/shared/TheHeader.vue";
 import DialogComponent from "@/components/shared/DialogComponent.vue";
 import LoadingComponent from "@/components/shared/LoadingComponent.vue";
 
-export default {
+export default defineComponent({
   components: {
     TheHeader,
     DialogComponent,
     LoadingComponent,
   },
-  created() {
-    this.initAuth();
-  },
-  computed: {
-    ...mapState("auth", ["authUser"]),
-    ...mapGetters("utils", [
-      "showDialog",
-      "dialogMessage",
-      "dialogIsSuccess",
-      "targetLocation",
-    ]),
-    ...mapState("utils", ["isLoading"]),
-  },
-  methods: {
-    ...mapActions("utils", ["closeDialog"]),
-    ...mapActions("auth", ["initAuth"]),
-    navigateToLocation() {
-      if (this.targetLocation) {
-        this.$router.push(this.targetLocation);
+  setup() {
+    const store = useStore();
+    const router = useRouter();
+
+    const authUser = computed(() => store.state.auth.authUser);
+    const showDialog = computed(() => store.getters["utils/showDialog"]);
+    const dialogMessage = computed(() => store.getters["utils/dialogMessage"]);
+    const dialogIsSuccess = computed(
+      () => store.getters["utils/dialogIsSuccess"]
+    );
+    const targetLocation = computed(
+      () => store.getters["utils/targetLocation"]
+    );
+    const isLoading = computed(() => store.state.utils.isLoading);
+
+    onMounted(() => {
+      store.dispatch("auth/initAuth");
+    });
+
+    const navigateToLocation = () => {
+      if (targetLocation.value) {
+        router.push(targetLocation.value);
       }
-      this.closeDialog();
-    },
+      store.dispatch("utils/closeDialog");
+    };
+
+    return {
+      authUser,
+      showDialog,
+      dialogMessage,
+      dialogIsSuccess,
+      isLoading,
+      navigateToLocation,
+    };
   },
-};
+});
 </script>
 
 <style lang="scss">
