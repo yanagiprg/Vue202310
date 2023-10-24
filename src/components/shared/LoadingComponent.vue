@@ -5,11 +5,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { mapState } from "vuex";
+import { defineComponent, computed } from "vue";
+import { useStore } from "vuex";
+
 export default defineComponent({
-  computed: {
-    ...mapState("utils", ["isLoading"]),
+  setup() {
+    const store = useStore();
+    const isLoading = computed(() => store.state.utils.isLoading);
+    return {
+      isLoading,
+    };
   },
 });
 </script>

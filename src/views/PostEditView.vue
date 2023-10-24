@@ -11,65 +11,66 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 import PostForm from "@/components/post/PostForm.vue";
-import { mapActions } from "vuex";
+import { Article } from "@/types/types";
+const route = useRoute();
+const store = useStore();
 
-export default {
-  components: {
-    PostForm,
-  },
-  data(): any {
-    return {
-      post: {
-        id: this.$route.params.id,
-        title: "",
-        content: "",
-        imageUrl: "",
-        updatedAt: new Date(),
-        tags: [],
-      },
-    };
-  },
-  async mounted() {
-    await this.fetchPost();
-  },
-  methods: {
-    ...mapActions("posts", ["updatePost", "getPostById"]),
-    ...mapActions("utils", ["openDialog", "setLoading"]),
-    async fetchPost() {
-      const fetchedPost = await this.getPostById(this.post.id);
-      if (fetchedPost) {
-        this.post = fetchedPost;
-      }
+const postId = route.params.id as string;
+const post = ref<Article>({
+  id: postId,
+  title: "",
+  content: "",
+  imageUrl: "",
+  updatedAt: new Date(),
+  tags: [],
+  image: undefined,
+  userId: "",
+  userName: "",
+  createdAt: undefined,
+});
+
+onMounted(async () => {
+  await fetchPost();
+});
+
+const fetchPost = async () => {
+  const fetchedPost = await store.dispatch("posts/getPostById", postId);
+  if (fetchedPost) {
+    post.value = fetchedPost;
+  }
+};
+
+const handleUpdatePost = async (payload: any) => {
+  store.dispatch("utils/setLoading", true);
+  const isUpdate = await store.dispatch("posts/updatePost", {
+    post: {
+      ...post.value,
+      title: payload.post.title,
+      content: payload.post.content,
+      imageUrl: payload.post.imageUrl,
+      updatedAt: new Date(),
+      tags: payload.tags,
     },
-    async handleUpdatePost(payload) {
-      this.setLoading(true);
-      const isUpdate = await this.updatePost({
-        post: {
-          ...this.post,
-          title: payload.post.title,
-          content: payload.post.content,
-          imageUrl: payload.post.imageUrl,
-          updatedAt: new Date(),
-          tags: payload.tags,
-        },
-        image: payload.image,
-      });
-      this.setLoading(false);
-      if (isUpdate) {
-        this.openDialog({
-          message: "投稿を更新しました",
-          success: true,
-          targetLocation: `/post/${this.post.id}`,
-        });
-      } else {
-        this.openDialog({
-          message: "投稿の更新に失敗しました。",
-          success: false,
-        });
-      }
-    },
-  },
+    image: payload.image,
+  });
+  store.dispatch("utils/setLoading", false);
+
+  if (isUpdate) {
+    store.dispatch("utils/openDialog", {
+      message: "投稿を更新しました",
+      success: true,
+      targetLocation: `/post/${post.value.id}`,
+    });
+  } else {
+    store.dispatch("utils/openDialog", {
+      message: "投稿の更新に失敗しました。",
+      success: false,
+    });
+  }
 };
 </script>

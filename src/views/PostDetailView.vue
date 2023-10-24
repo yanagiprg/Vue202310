@@ -48,9 +48,9 @@ getPostById(postId.value);
 getComments(postId.value);
 
 const removePost = async (id) => {
-  store.commit("utils/setLoading", true);
+  store.dispatch("utils/setLoading", true);
   const isDelete = await store.dispatch("posts/removePost", id);
-  store.commit("utils/setLoading", false);
+  store.dispatch("utils/setLoading", false);
 
   if (isDelete) {
     store.dispatch("utils/openDialog", {
