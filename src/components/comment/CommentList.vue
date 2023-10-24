@@ -1,5 +1,5 @@
 <template>
-  <div v-if="pagedComments?.length">
+  <div v-if="pagedComments.length">
     <div class="mt-10 max-w-2xl mx-auto">
       <h3 class="text-xl font-semibold mb-4 border-b-2 border-gray-300 pb-2">
         コメント
@@ -9,7 +9,7 @@
         :key="comment.id"
         :comment="comment"
         :authUser="authUser"
-        @deleteComment="deleteComment"
+        @deleteComment="emitDeleteComment"
       />
     </div>
     <pagination-component
@@ -21,57 +21,52 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+import { ref, computed, defineProps, defineEmits, PropType } from "vue";
 import CommentItem from "@/components/comment/CommentItem.vue";
 import PaginationComponent from "../shared/PaginationComponent.vue";
 
-export default {
-  components: {
-    CommentItem,
-    PaginationComponent,
-  },
-  props: {
-    comments: Array,
-    authUser: Object,
-  },
-  data(): any {
-    return {
-      newComment: "",
-      currentPage: 1,
-      commentsPerPage: 5,
-    };
-  },
-  computed: {
-    sortedComments() {
-      const commentList = this.comments;
-      commentList.sort((a, b) => {
-        return a.createdAt < b.createdAt ? 1 : -1;
-      });
-      return commentList;
-    },
-    pagedComments() {
-      const startIndex = (this.currentPage - 1) * 5;
-      const endIndex = this.currentPage * 5;
-      return this.sortedComments.slice(startIndex, endIndex);
-    },
-    totalComments() {
-      return Math.ceil(this.comments.length / this.commentsPerPage);
-    },
-  },
-  methods: {
-    deleteComment(commentId) {
-      this.$emit("deleteComment", commentId);
-    },
-    nextPage() {
-      if (this.currentPage < this.totalComments) {
-        this.currentPage += 1;
-      }
-    },
-    previousPage() {
-      if (this.currentPage > 1) {
-        this.currentPage -= 1;
-      }
-    },
-  },
+import { Comment } from "@/types/types";
+
+const props = defineProps({
+  comments: Array as PropType<Comment[]>,
+  authUser: Object,
+});
+
+const currentPage = ref(1);
+const commentsPerPage = 5;
+
+const sortedComments = computed(() => {
+  const commentList = [...props.comments];
+  commentList.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  return commentList;
+});
+
+const pagedComments = computed(() => {
+  const startIndex = (currentPage.value - 1) * commentsPerPage;
+  const endIndex = currentPage.value * commentsPerPage;
+  return sortedComments.value.slice(startIndex, endIndex);
+});
+
+const totalComments = computed(() => {
+  return Math.ceil(props.comments.length / commentsPerPage);
+});
+
+const emit = defineEmits(["deleteComment"]);
+
+const emitDeleteComment = (commentId) => {
+  emit("deleteComment", commentId);
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalComments.value) {
+    currentPage.value += 1;
+  }
+};
+
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value -= 1;
+  }
 };
 </script>

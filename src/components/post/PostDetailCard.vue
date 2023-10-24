@@ -17,15 +17,15 @@
       </div>
     </div>
     <router-link
-      v-if="authUser && authUser.uid === post.userId"
+      v-if="isAuthor"
       :to="`/post/${post.id}/edit`"
       class="mt-4 mr-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
     >
       編集
     </router-link>
     <button
-      v-if="authUser && authUser.uid === post.userId"
-      @click.prevent="deletePost"
+      v-if="isAuthor"
+      @click="deletePost"
       class="mt-4 ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
     >
       削除
@@ -33,24 +33,20 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+import { defineProps, defineEmits, computed } from "vue";
 import { formatTimestamp } from "@/utils/formatTimestamp";
-
 import TagList from "../tag/TagList.vue";
 
-export default {
-  components: {
-    TagList,
-  },
-  props: {
-    authUser: Object,
-    post: Object,
-  },
-  methods: {
-    async deletePost() {
-      this.$emit("deletePost", this.post.id);
-    },
-    formatTimestamp,
-  },
+const props = defineProps({
+  authUser: Object,
+  post: Object,
+});
+
+const isAuthor = computed(() => props.authUser?.uid === props.post.userId);
+
+const emit = defineEmits(["deletePost"]);
+const deletePost = () => {
+  emit("deletePost", props.post.id);
 };
 </script>
