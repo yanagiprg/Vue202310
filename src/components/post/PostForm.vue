@@ -63,13 +63,24 @@
       >
       <input id="image" type="file" @change="onFileChange" />
     </div>
-    <div class="text-right">
-      <button
-        type="submit"
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-      >
-        {{ isEditMode ? "更新" : "投稿" }}
-      </button>
+    <div class="flex justify-between">
+      <div class="text-left">
+        <button
+          type="button"
+          class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
+          @click.prevent="handleCancel"
+        >
+          キャンセル
+        </button>
+      </div>
+      <div class="text-right">
+        <button
+          type="submit"
+          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+        >
+          {{ isEditMode ? "更新" : "投稿" }}
+        </button>
+      </div>
     </div>
   </form>
 </template>
@@ -77,6 +88,7 @@
 <script lang="ts" setup>
 import TagList from "../tag/TagList.vue";
 import { defineEmits, defineProps, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 
 import { Article } from "@/types/types";
 
@@ -101,6 +113,8 @@ const post = ref({
 const tagInput = ref("");
 const tags = ref([]);
 const image = ref(null);
+
+const router = useRouter();
 
 if (props.authUser) {
   post.value.userId = props.authUser.uid;
@@ -148,5 +162,9 @@ const handleSubmit = () => {
 
 const onFileChange = (event) => {
   image.value = event.target.files[0];
+};
+
+const handleCancel = () => {
+  router.go(-1);
 };
 </script>

@@ -16,20 +16,20 @@
         <tag-list :tags="post.tags" />
       </div>
     </div>
-    <router-link
-      v-if="isAuthor"
-      :to="`/post/${post.id}/edit`"
-      class="mt-4 mr-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-    >
-      編集
-    </router-link>
     <button
       v-if="isAuthor"
       @click="deletePost"
-      class="mt-4 ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
+      class="mt-4 mr-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
     >
       削除
     </button>
+    <router-link
+      v-if="isAuthor"
+      :to="`/post/${post.id}/edit`"
+      class="mt-4 ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+    >
+      編集
+    </router-link>
   </div>
 </template>
 
