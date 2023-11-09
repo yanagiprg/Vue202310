@@ -4,13 +4,19 @@
   </div>
 </template>
 
-<script>
-import { mapState } from "vuex";
-export default {
-  computed: {
-    ...mapState("utils", ["isLoading"]),
+<script lang="ts">
+import { defineComponent, computed } from "vue";
+import { useStore } from "vuex";
+
+export default defineComponent({
+  setup() {
+    const store = useStore();
+    const isLoading = computed(() => store.state.utils.isLoading);
+    return {
+      isLoading,
+    };
   },
-};
+});
 </script>
 
 <style scoped>

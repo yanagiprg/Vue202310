@@ -3,78 +3,78 @@
     <post-detail-card
       v-if="post"
       :post="post"
-      :authUser="this.authUser"
+      :authUser="authUser"
       @deletePost="deletePost"
     />
     <comment-list
       v-if="comments"
       :comments="comments"
-      :authUser="this.authUser"
+      :authUser="authUser"
       @deleteComment="removeComment"
     />
     <comment-create
-      v-if="this.authUser"
-      :authUser="this.authUser"
+      v-if="authUser"
+      :authUser="authUser"
       @submitComment="submitComment"
     />
   </div>
 </template>
 
-<script lang="ts">
-import { mapState, mapActions } from "vuex";
-import { formatTimestamp } from "@/utils/formatTimestamp";
+<script lang="ts" setup>
+import { ref, computed } from "vue";
+import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 import CommentList from "@/components/comment/CommentList.vue";
 import CommentCreate from "@/components/comment/CommentCreate.vue";
 import PostDetailCard from "@/components/post/PostDetailCard.vue";
 
-export default {
-  components: { CommentList, CommentCreate, PostDetailCard },
-  data(): any {
-    return {
-      postId: this.$route.params.id,
-    };
-  },
-  async created() {
-    await this.getPostById(this.postId);
-    await this.getComments(this.postId);
-  },
-  computed: {
-    ...mapState("auth", ["authUser"]),
-    ...mapState("posts", ["post", "comments"]),
-  },
-  methods: {
-    ...mapActions("posts", [
-      "getPostById",
-      "removePost",
-      "getComments",
-      "addComment",
-      "deleteComment",
-    ]),
-    ...mapActions("utils", ["openDialog", "setLoading"]),
-    async deletePost(id) {
-      this.setLoading(true);
-      const isDelete = await this.removePost(id);
-      this.setLoading(false);
-      if (isDelete) {
-        this.openDialog({
-          message: "投稿を削除しました",
-          success: true,
-          targetLocation: "/",
-        });
-      } else {
-        this.openDialog({
-          message: "投稿の削除に失敗しました。",
-          success: false,
-        });
-      }
-    },
-    submitComment(comment) {
-      this.addComment({ postId: this.postId, comment });
-    },
-    removeComment(commentId) {
-      this.deleteComment({ postId: this.postId, commentId });
-    },
-    formatTimestamp,
-  },
+const store = useStore();
+const route = useRoute();
+const postId = ref(route.params.id as string);
+
+const authUser = computed(() => store.state.auth.authUser);
+const post = computed(() => store.state.posts.post);
+const comments = computed(() => store.state.posts.comments);
+
+const getPostById = async (id) => {
+  await store.dispatch("posts/getPostById", id);
 };
+
+const getComments = async (id) => {
+  await store.dispatch("posts/getComments", id);
+};
+
+getPostById(postId.value);
+getComments(postId.value);
+
+const removePost = async (id) => {
+  store.dispatch("utils/setLoading", true);
+  const isDelete = await store.dispatch("posts/removePost", id);
+  store.dispatch("utils/setLoading", false);
+
+  if (isDelete) {
+    store.dispatch("utils/openDialog", {
+      message: "投稿を削除しました",
+      success: true,
+      targetLocation: "/",
+    });
+  } else {
+    store.dispatch("utils/openDialog", {
+      message: "投稿の削除に失敗しました。",
+      success: false,
+    });
+  }
+};
+
+const addComment = (comment) => {
+  store.dispatch("posts/addComment", { postId: postId.value, comment });
+};
+
+const deleteComment = (commentId) => {
+  store.dispatch("posts/deleteComment", { postId: postId.value, commentId });
+};
+
+const deletePost = (id) => removePost(id);
+const submitComment = (comment) => addComment(comment);
+const removeComment = (commentId) => deleteComment(commentId);
 </script>

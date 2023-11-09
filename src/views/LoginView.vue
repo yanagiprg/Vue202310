@@ -46,56 +46,55 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapActions } from "vuex";
+<script lang="ts" setup>
+import { ref } from "vue";
+import { useStore } from "vuex";
 
-export default {
-  data(): any {
-    return {
-      email: "",
-      password: "",
-    };
-  },
-  methods: {
-    ...mapActions("auth", ["login", "loginWithGoogle"]),
-    ...mapActions("utils", ["openDialog", "setLoading"]),
-    async signin() {
-      this.setLoading(true);
-      const isLogin = await this.login({
-        email: this.email,
-        password: this.password,
-      });
-      this.setLoading(false);
-      if (isLogin) {
-        this.openDialog({
-          message: "ログインに成功しました！",
-          success: true,
-          targetLocation: "/",
-        });
-      } else {
-        this.openDialog({
-          message: "ログインに失敗しました。",
-          success: false,
-        });
-      }
-    },
-    async signinWithGoogle() {
-      this.setLoading(true);
-      const isLogin = await this.loginWithGoogle();
-      this.setLoading(false);
-      if (isLogin) {
-        this.openDialog({
-          message: "Googleアカウントでのログインに成功しました！",
-          success: true,
-          targetLocation: "/",
-        });
-      } else {
-        this.openDialog({
-          message: "Googleアカウントでのログインに失敗しました。",
-          success: false,
-        });
-      }
-    },
-  },
+const store = useStore();
+const email = ref("");
+const password = ref("");
+
+const setLoading = (loading: boolean) =>
+  store.dispatch("utils/setLoading", loading);
+const openDialog = (options: any) =>
+  store.dispatch("utils/openDialog", options);
+
+const signin = async () => {
+  setLoading(true);
+  const isLogin = await store.dispatch("auth/login", {
+    email: email.value,
+    password: password.value,
+  });
+  setLoading(false);
+  if (isLogin) {
+    openDialog({
+      message: "ログインに成功しました！",
+      success: true,
+      targetLocation: "/",
+    });
+  } else {
+    openDialog({
+      message: "ログインに失敗しました。",
+      success: false,
+    });
+  }
+};
+
+const signinWithGoogle = async () => {
+  setLoading(true);
+  const isLogin = await store.dispatch("auth/loginWithGoogle");
+  setLoading(false);
+  if (isLogin) {
+    openDialog({
+      message: "Googleアカウントでのログインに成功しました！",
+      success: true,
+      targetLocation: "/",
+    });
+  } else {
+    openDialog({
+      message: "Googleアカウントでのログインに失敗しました。",
+      success: false,
+    });
+  }
 };
 </script>

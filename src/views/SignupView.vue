@@ -55,43 +55,46 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapActions } from "vuex";
+<script lang="ts" setup>
+import { ref } from "vue";
+import { useStore } from "vuex";
 
-export default {
-  data(): any {
-    return {
-      user: {
-        email: "",
-        password: "",
-        displayName: "",
-        photoURL: null,
-      },
-    };
-  },
-  methods: {
-    ...mapActions("auth", ["signup"]),
-    ...mapActions("utils", ["openDialog", "setLoading"]),
-    async signupUser() {
-      this.setLoading(true);
-      const isSignup = await this.signup(this.user);
-      this.setLoading(false);
-      if (isSignup) {
-        this.openDialog({
-          message: "ユーザー登録に成功しました",
-          success: true,
-          targetLocation: "/",
-        });
-      } else {
-        this.openDialog({
-          message: "ユーザー登録に失敗しました。",
-          success: false,
-        });
-      }
-    },
-    async onFileChange(event) {
-      this.user.photoURL = event.target.files[0];
-    },
-  },
+const store = useStore();
+const user = ref({
+  email: "",
+  password: "",
+  displayName: "",
+  photoURL: null as File | null,
+});
+
+const setLoading = (loading: boolean) =>
+  store.dispatch("utils/setLoading", loading);
+const openDialog = (options: any) =>
+  store.dispatch("utils/openDialog", options);
+const signup = async (user: any) => store.dispatch("auth/signup", user);
+
+const signupUser = async () => {
+  setLoading(true);
+  const isSignup = await signup(user.value);
+  setLoading(false);
+  if (isSignup) {
+    openDialog({
+      message: "ユーザー登録に成功しました",
+      success: true,
+      targetLocation: "/",
+    });
+  } else {
+    openDialog({
+      message: "ユーザー登録に失敗しました。",
+      success: false,
+    });
+  }
+};
+
+const onFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files) {
+    user.value.photoURL = target.files[0];
+  }
 };
 </script>

@@ -1,70 +1,68 @@
-import Vue from "vue";
-import VueRouter, { RouteConfig } from "vue-router";
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { NavigationGuardNext, RouteLocationNormalized } from "vue-router";
 
-Vue.use(VueRouter);
-
-const routes: Array<RouteConfig> = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "home",
-    component: () =>
-      import(/* webpackChunkName: "signup" */ "../views/PostListView.vue"),
+    component: () => import("../views/PostListView.vue"),
   },
   {
     path: "/signup",
     name: "signup",
-    component: () =>
-      import(/* webpackChunkName: "signup" */ "../views/SignupView.vue"),
+    component: () => import("../views/SignupView.vue"),
   },
   {
     path: "/login",
     name: "login",
-    component: () =>
-      import(/* webpackChunkName: "login" */ "../views/LoginView.vue"),
+    component: () => import("../views/LoginView.vue"),
   },
   {
     path: "/post",
-    beforeEnter(to, from, next) {
+    redirect: "/",
+    beforeEnter: (
+      to: RouteLocationNormalized,
+      from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
       next("/");
     },
   },
   {
     path: "/post/create",
     name: "post-create",
-    component: () =>
-      import(
-        /* webpackChunkName: "create-post" */ "../views/PostCreateView.vue"
-      ),
+    component: () => import("../views/PostCreateView.vue"),
   },
   {
     path: "/post/:id",
     name: "post",
-    component: () =>
-      import(/* webpackChunkName: "post" */ "../views/PostDetailView.vue"),
+    component: () => import("../views/PostDetailView.vue"),
   },
   {
     path: "/post/:id/edit",
     name: "post-edit",
-    component: () =>
-      import(/* webpackChunkName: "edit-post" */ "../views/PostEditView.vue"),
+    component: () => import("../views/PostEditView.vue"),
   },
   {
     path: "/user",
-    beforeEnter(to, from, next) {
-      next("/");
+    redirect: "/login",
+    beforeEnter: (
+      to: RouteLocationNormalized,
+      from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
+      next("/login");
     },
   },
   {
     path: "/user/:id",
     name: "user-profile",
-    component: () =>
-      import(/* webpackChunkName: "user" */ "../views/UserView.vue"),
+    component: () => import("../views/UserView.vue"),
   },
 ];
 
-const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 

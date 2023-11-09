@@ -7,76 +7,82 @@
       <div
         class="absolute top-0 left-0 w-full h-full bg-black opacity-50"
       ></div>
-      <div
-        :class="['rounded-lg shadow-lg w-2/3 max-w-md', 'relative', 'bg-white']"
-      >
+      <div :class="dialogClasses">
         <div
-          :class="switchBGColor"
+          :class="bgColorClass"
           class="w-full h-8 rounded-t-lg flex items-center justify-center p-4"
         ></div>
-        <div class="">
+        <div>
           <p class="text-lg font-medium bold text-gray-500 mt-8">
             {{ message }}
           </p>
         </div>
         <div class="text-right p-4">
-          <button
-            @click="close"
-            class="border px-3 py-1 rounded"
-            :class="switchBorderColor"
-          >
-            閉じる
-          </button>
+          <button @click="close" :class="buttonClasses">閉じる</button>
         </div>
       </div>
     </div>
   </transition>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, ref, computed, PropType, SetupContext } from "vue";
+
+export default defineComponent({
   props: {
     message: {
-      type: String,
+      type: String as PropType<string>,
       default: "",
     },
     success: {
-      type: Boolean,
+      type: Boolean as PropType<boolean>,
+      default: true,
+    },
+    visible: {
+      type: Boolean as PropType<boolean>,
       default: true,
     },
   },
-  data() {
+  emits: ["update:visible", "dialogClosed"],
+  setup(props, context: SetupContext) {
+    const dialogClasses = ref([
+      "rounded-lg",
+      "shadow-lg",
+      "w-2/3",
+      "max-w-md",
+      "relative",
+      "bg-white",
+    ]);
+
+    const bgColorClass = computed(() => {
+      return props.success ? "bg-blue-600" : "bg-red-600";
+    });
+
+    const buttonClasses = computed(() => {
+      return [
+        "border",
+        "px-3",
+        "py-1",
+        "rounded",
+        props.success
+          ? "border-blue-600 text-blue-500 hover:bg-blue-100 hover:text-blue-600"
+          : "border-red-600 text-red-500 hover:bg-red-100 hover:text-red-600",
+      ];
+    });
+
+    const close = () => {
+      context.emit("update:visible", false);
+      context.emit("dialogClosed");
+    };
+
     return {
-      visible: true,
+      dialogClasses,
+      bgColorClass,
+      buttonClasses,
+      close,
     };
   },
-  computed: {
-    switchBGColor() {
-      return this.success ? "bg-blue-600" : "bg-red-600";
-    },
-    switchBorderColor() {
-      return this.success
-        ? [
-            "border-blue-600",
-            "text-blue-500",
-            "hover:bg-blue-100",
-            "hover:text-blue-600",
-          ]
-        : [
-            "border-red-600",
-            "text-red-500",
-            "hover:bg-red-100",
-            "hover:text-red-600",
-          ];
-    },
-  },
-  methods: {
-    close() {
-      this.$emit("update:visible", false);
-      this.$emit("dialogClosed");
-    },
-  },
-};
+});
 </script>
 
 <style scoped>

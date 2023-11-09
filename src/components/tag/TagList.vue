@@ -17,22 +17,24 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  props: {
-    tags: Array,
-    isEditTag: {
-      type: Boolean,
-      default: false,
-    },
+<script lang="ts" setup>
+import { defineProps, defineEmits } from "vue";
+
+defineProps({
+  tags: Array,
+  isEditTag: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    filterByTag(tag) {
-      this.$emit("filterByTag", tag);
-    },
-    removeTag(index) {
-      this.$emit("removeTag", index);
-    },
-  },
+});
+
+const emits = defineEmits(["filterByTag", "removeTag"]);
+
+const filterByTag = (tag) => {
+  emits("filterByTag", tag);
+};
+
+const removeTag = (index) => {
+  emits("removeTag", index);
 };
 </script>
