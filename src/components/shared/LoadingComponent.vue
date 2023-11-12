@@ -4,19 +4,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed } from "vue";
+<script lang="ts" setup>
+import { computed, defineComponent } from "vue";
 import { useStore } from "vuex";
-
-export default defineComponent({
-  setup() {
-    const store = useStore();
-    const isLoading = computed(() => store.state.utils.isLoading);
-    return {
-      isLoading,
-    };
-  },
+defineComponent({
+  name: "LoadingComponent",
 });
+const store = useStore();
+const isLoading = computed(() => store.state.utils.isLoading);
 </script>
 
 <style scoped>

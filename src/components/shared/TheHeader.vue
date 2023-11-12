@@ -35,41 +35,32 @@
   </header>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { useStore } from "vuex";
-import { computed, defineComponent } from "vue";
+import { computed } from "vue";
 
-export default defineComponent({
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const authUser = computed(() => store.state.auth.authUser);
+const authUser = computed(() => store.state.auth.authUser);
 
-    const logoutUser = async () => {
-      store.dispatch("utils/setLoading", true);
-      const isLogout = await store.dispatch("auth/logout");
-      store.dispatch("utils/setLoading", false);
+const logoutUser = async () => {
+  store.dispatch("utils/setLoading", true);
+  const isLogout = await store.dispatch("auth/logout");
+  store.dispatch("utils/setLoading", false);
 
-      if (isLogout) {
-        store.dispatch("utils/openDialog", {
-          message: "ログアウトしました",
-          success: true,
-          targetLocation: "/login",
-        });
-      } else {
-        store.dispatch("utils/openDialog", {
-          message: "ログアウトに失敗しました。",
-          success: false,
-        });
-      }
-    };
-
-    return {
-      authUser,
-      logoutUser,
-    };
-  },
-});
+  if (isLogout) {
+    store.dispatch("utils/openDialog", {
+      message: "ログアウトしました",
+      success: true,
+      targetLocation: "/login",
+    });
+  } else {
+    store.dispatch("utils/openDialog", {
+      message: "ログアウトに失敗しました。",
+      success: false,
+    });
+  }
+};
 </script>
 
 <style lang="scss" scoped>

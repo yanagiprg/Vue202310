@@ -12,56 +12,34 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, computed } from "vue";
+<script lang="ts" setup>
+import { onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import TheHeader from "@/components/shared/TheHeader.vue";
 import DialogComponent from "@/components/shared/DialogComponent.vue";
 import LoadingComponent from "@/components/shared/LoadingComponent.vue";
 
-export default defineComponent({
-  components: {
-    TheHeader,
-    DialogComponent,
-    LoadingComponent,
-  },
-  setup() {
-    const store = useStore();
-    const router = useRouter();
+const store = useStore();
+const router = useRouter();
 
-    const authUser = computed(() => store.state.auth.authUser);
-    const showDialog = computed(() => store.getters["utils/showDialog"]);
-    const dialogMessage = computed(() => store.getters["utils/dialogMessage"]);
-    const dialogIsSuccess = computed(
-      () => store.getters["utils/dialogIsSuccess"]
-    );
-    const targetLocation = computed(
-      () => store.getters["utils/targetLocation"]
-    );
-    const isLoading = computed(() => store.state.utils.isLoading);
+const authUser = computed(() => store.state.auth.authUser);
+const showDialog = computed(() => store.getters["utils/showDialog"]);
+const dialogMessage = computed(() => store.getters["utils/dialogMessage"]);
+const dialogIsSuccess = computed(() => store.getters["utils/dialogIsSuccess"]);
+const targetLocation = computed(() => store.getters["utils/targetLocation"]);
+const isLoading = computed(() => store.state.utils.isLoading);
 
-    onMounted(() => {
-      store.dispatch("auth/initAuth");
-    });
-
-    const navigateToLocation = () => {
-      if (targetLocation.value) {
-        router.push(targetLocation.value);
-      }
-      store.dispatch("utils/closeDialog");
-    };
-
-    return {
-      authUser,
-      showDialog,
-      dialogMessage,
-      dialogIsSuccess,
-      isLoading,
-      navigateToLocation,
-    };
-  },
+onMounted(() => {
+  store.dispatch("auth/initAuth");
 });
+
+const navigateToLocation = () => {
+  if (targetLocation.value) {
+    router.push(targetLocation.value);
+  }
+  store.dispatch("utils/closeDialog");
+};
 </script>
 
 <style lang="scss">
