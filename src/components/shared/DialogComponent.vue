@@ -25,64 +25,58 @@
   </transition>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, computed, PropType, SetupContext } from "vue";
+<script lang="ts" setup>
+import { ref, computed, defineProps, defineEmits, defineComponent } from "vue";
+defineComponent({
+  name: "DialogComponent",
+});
 
-export default defineComponent({
-  props: {
-    message: {
-      type: String as PropType<string>,
-      default: "",
-    },
-    success: {
-      type: Boolean as PropType<boolean>,
-      default: true,
-    },
-    visible: {
-      type: Boolean as PropType<boolean>,
-      default: true,
-    },
+const props = defineProps({
+  message: {
+    type: String,
+    default: "",
   },
-  emits: ["update:visible", "dialogClosed"],
-  setup(props, context: SetupContext) {
-    const dialogClasses = ref([
-      "rounded-lg",
-      "shadow-lg",
-      "w-2/3",
-      "max-w-md",
-      "relative",
-      "bg-white",
-    ]);
-
-    const bgColorClass = computed(() => {
-      return props.success ? "bg-blue-600" : "bg-red-600";
-    });
-
-    const buttonClasses = computed(() => {
-      return [
-        "border",
-        "px-3",
-        "py-1",
-        "rounded",
-        props.success
-          ? "border-blue-600 text-blue-500 hover:bg-blue-100 hover:text-blue-600"
-          : "border-red-600 text-red-500 hover:bg-red-100 hover:text-red-600",
-      ];
-    });
-
-    const close = () => {
-      context.emit("update:visible", false);
-      context.emit("dialogClosed");
-    };
-
-    return {
-      dialogClasses,
-      bgColorClass,
-      buttonClasses,
-      close,
-    };
+  success: {
+    type: Boolean,
+    default: true,
+  },
+  visible: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const emits = defineEmits(["update:visible", "dialogClosed"]);
+
+const dialogClasses = ref([
+  "rounded-lg",
+  "shadow-lg",
+  "w-2/3",
+  "max-w-md",
+  "relative",
+  "bg-white",
+]);
+
+const bgColorClass = computed(() => {
+  return props.success ? "bg-blue-600" : "bg-red-600";
+});
+
+const buttonClasses = computed(() => {
+  return [
+    "border",
+    "px-3",
+    "py-1",
+    "rounded",
+    props.success
+      ? "border-blue-600 text-blue-500 hover:bg-blue-100 hover:text-blue-600"
+      : "border-red-600 text-red-500 hover:bg-red-100 hover:text-red-600",
+  ];
+});
+
+const close = () => {
+  emits("update:visible", false);
+  emits("dialogClosed");
+};
 </script>
 
 <style scoped>

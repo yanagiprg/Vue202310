@@ -15,7 +15,7 @@ export default {
   components: {
     PostForm,
   },
-  data(): any {
+  data() {
     return {};
   },
   computed: {

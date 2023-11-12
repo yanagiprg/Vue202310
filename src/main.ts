@@ -7,9 +7,9 @@ import "./assets/styles.css";
 import DialogComponent from "@/components/shared/DialogComponent.vue";
 import LoadingComponent from "@/components/shared/LoadingComponent.vue";
 
-const app = createApp(App);
-app.component("DialogComponent", DialogComponent);
-app.component("LoadingComponent", LoadingComponent);
+const app = createApp(App as any);
+app.component("DialogComponent", DialogComponent as any);
+app.component("LoadingComponent", LoadingComponent as any);
 
 app.use(router);
 app.use(store);
