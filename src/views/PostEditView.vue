@@ -45,7 +45,7 @@ const fetchPost = async () => {
   }
 };
 
-const handleUpdatePost = async (payload: any) => {
+const handleUpdatePost = async (payload) => {
   store.dispatch("utils/setLoading", true);
   const isUpdate = await store.dispatch("posts/updatePost", {
     post: {

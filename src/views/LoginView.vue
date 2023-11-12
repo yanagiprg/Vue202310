@@ -56,8 +56,7 @@ const password = ref("");
 
 const setLoading = (loading: boolean) =>
   store.dispatch("utils/setLoading", loading);
-const openDialog = (options: any) =>
-  store.dispatch("utils/openDialog", options);
+const openDialog = (options) => store.dispatch("utils/openDialog", options);
 
 const signin = async () => {
   setLoading(true);

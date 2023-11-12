@@ -69,9 +69,8 @@ const user = ref({
 
 const setLoading = (loading: boolean) =>
   store.dispatch("utils/setLoading", loading);
-const openDialog = (options: any) =>
-  store.dispatch("utils/openDialog", options);
-const signup = async (user: any) => store.dispatch("auth/signup", user);
+const openDialog = (options) => store.dispatch("utils/openDialog", options);
+const signup = async (user) => store.dispatch("auth/signup", user);
 
 const signupUser = async () => {
   setLoading(true);
